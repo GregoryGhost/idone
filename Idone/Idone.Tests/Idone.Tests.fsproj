@@ -12,9 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Expecto" Version="8.*" />
+    <PackageReference Include="Expecto" Version="8.10.1" />
+    <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="10.0.2" />
     <PackageReference Include="FSharp.Core" Version="4.*" />
-    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.*" />
+    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
   </ItemGroup>
 </Project>
