@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Idone.Back.Controllers
 {
+    using Idone.Core;
+
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -14,9 +16,9 @@ namespace Idone.Back.Controllers
     {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult Get()
         {
-            return new string[] { "value1", "value2" };
+            return Ok(Class1.TestDatas(2));
         }
 
         // GET api/values/5
