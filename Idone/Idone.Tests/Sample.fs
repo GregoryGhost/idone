@@ -20,4 +20,7 @@ let tests =
 
       Expect.isNone actual "Не совпали"
     }
+    //TODO: добавить функции для Expect - Expect.isRight, Expect.isLeft
+    //  для того чтобы можно было работать с монадой Either
+    //TODO: добавить тесты для проверки работы с ролями, правами, пользователями
   ]

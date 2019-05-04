@@ -17,6 +17,7 @@
     public interface ISecurityModule
     {
         Option<Test> RegistrateUser(Test test);
+        //TODO:дополнить остальными методами для Ролей, Прав.
     }
 
     public class Test
