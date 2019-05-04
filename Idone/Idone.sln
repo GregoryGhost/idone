@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Idone.Security", "Idone.Sec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Idone.Core", "Idone.Core\Idone.Core.csproj", "{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Idone.DAL", "Idone.DAL\Idone.DAL.csproj", "{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
