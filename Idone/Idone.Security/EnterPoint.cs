@@ -12,12 +12,24 @@
                 ? Some(test)
                 : None;
         }
+
+        public Either<Error, Test> RegistrateUserEither(Test test)
+        {
+            return test != null
+                ? Right<Error, Test>(test)
+                : Left(Error.Exception);
+        }
     }
 
     public interface ISecurityModule
     {
         Option<Test> RegistrateUser(Test test);
         //TODO:дополнить остальными методами для Ролей, Прав.
+    }
+
+    public enum Error
+    {
+        Exception = 0,
     }
 
     public class Test
