@@ -19,6 +19,10 @@
                 ? Right<Error, Test>(test)
                 : Left(Error.Exception);
         }
+        public Test RegistrateUser2(Test test)
+        {
+            return new Test(test.Data);
+        }
     }
 
     public interface ISecurityModule
@@ -32,8 +36,18 @@
         Exception = 0,
     }
 
-    public class Test
+    public class Test: Record<Test>
     {
-        public int Data { get; set; }
+        public readonly int Data;
+
+        public Test()
+        {
+            Data = 234;
+        }
+
+        public Test(int data)
+        {
+            Data = data;
+        }
     }
 }

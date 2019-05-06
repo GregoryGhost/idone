@@ -36,6 +36,15 @@ module Tests =
           let actual = security.RegistrateUserEither(null)
 
           Expect.isLeft actual "Не совпали"
+        }    
+
+        test "Either areEqual Records language-ext'а" {
+          let security = new EnterPoint()
+          let test = new Test(666)
+          let actual = security.RegistrateUser2(test)
+          let expected = new Test(666)
+
+          Expect.areEqual actual expected "Не совпали"
         }
         //TODO: добавить тесты для проверки работы с ролями, правами, пользователями
       ]
