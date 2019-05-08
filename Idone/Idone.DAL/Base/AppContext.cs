@@ -3,6 +3,7 @@
     using System;
 
     using Idone.DAL.Dictionaries;
+    using Idone.DAL.Entities;
 
     using LanguageExt;
 
@@ -25,25 +26,25 @@
         {
         }
 
-        /// <summary>
-        /// Права доступа.
-        /// </summary>
-        public DbSet<Permission> Persmissions { get; set; }
+        ///// <summary>
+        ///// Права доступа.
+        ///// </summary>
+        //public DbSet<Permission> Persmissions { get; set; }
 
-        /// <summary>
-        /// Права доступа для ролей.
-        /// </summary>
-        public DbSet<RolePermission> RolePermissions { get; set; }
+        ///// <summary>
+        ///// Права доступа для ролей.
+        ///// </summary>
+        //public DbSet<RolePermission> RolePermissions { get; set; }
 
         /// <summary>
         /// Роли.
         /// </summary>
         public DbSet<Role> Roles { get; set; }
 
-        /// <summary>
-        /// Роли пользователей.
-        /// </summary>
-        public DbSet<UserRole> UserRoles { get; set; }
+        ///// <summary>
+        ///// Роли пользователей.
+        ///// </summary>
+        //public DbSet<UserRole> UserRoles { get; set; }
 
         /// <summary>
         /// Пользователи.

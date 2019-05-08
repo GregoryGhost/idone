@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Idone.Core\Idone.Core.csproj" />
+    <ProjectReference Include="..\Idone.DAL\Idone.DAL.csproj" />
   </ItemGroup>
 
 </Project>

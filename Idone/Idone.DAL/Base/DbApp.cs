@@ -1,5 +1,8 @@
 ﻿namespace Idone.DAL.Base
 {
+    using Idone.DAL.Entities;
+
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
