@@ -33,7 +33,6 @@
         public void ConfigureServices(IServiceCollection services)
         {
             var connString = Configuration.GetConnectionString("default");
-            //TODO: валится при сборке, скорее всего проблема где-то здесь
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).Services
                     .AddIdoneIdentity()
                     .AddIdoneDb(connString);

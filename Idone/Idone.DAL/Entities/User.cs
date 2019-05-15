@@ -11,6 +11,14 @@
     {
         public readonly FullName FullName;
 
+        /// <summary>
+        /// Конструктор для EF Core.
+        /// </summary>
+        /// TODO: чтобы добавилось поле FullName в БД нужно указать связь в OnModelCreating
+        private User()
+        {
+        }
+
         public User(FullName fullName)
         {
             FullName = fullName;
@@ -34,6 +42,13 @@
         public readonly string Patronymic;
 
         public readonly string Surname;
+
+        /// <summary>
+        /// Конструктор для EF Core.
+        /// </summary>
+        private FullName()
+        {
+        }
 
         public FullName(string surname, string name, string patronymic)
         {
