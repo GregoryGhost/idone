@@ -38,7 +38,7 @@
 
     public class Test: Record<Test>
     {
-        public readonly int Data;
+        public int Data { get; private set; }
 
         public Test()
         {
