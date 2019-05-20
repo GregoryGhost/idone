@@ -9,6 +9,7 @@
 
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
     using static LanguageExt.Prelude;
 
@@ -92,7 +93,16 @@
         /// <param name="modelBuilder"> Построитель моделей БД. </param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new UserConfig());
             base.OnModelCreating(modelBuilder);
+        }
+    }
+
+    public class UserConfig: IEntityTypeConfiguration<User>
+    {
+        public void Configure(EntityTypeBuilder<User> builder)
+        {
+            builder.OwnsOne(user => user.FullName);
         }
     }
 }

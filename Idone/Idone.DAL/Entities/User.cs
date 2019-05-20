@@ -9,12 +9,11 @@
     /// </summary>
     public class User : IdentityUser<int>
     {
-        public readonly FullName FullName;
+        public FullName FullName { get; private set; }
 
         /// <summary>
         /// Конструктор для EF Core.
         /// </summary>
-        /// TODO: чтобы добавилось поле FullName в БД нужно указать связь в OnModelCreating
         private User()
         {
         }
@@ -37,11 +36,11 @@
 
     public class FullName
     {
-        public readonly string Name;
+        public string Name { get; private set; }
 
-        public readonly string Patronymic;
+        public string Patronymic { get; private set; }
 
-        public readonly string Surname;
+        public string Surname { get; private set; }
 
         /// <summary>
         /// Конструктор для EF Core.
