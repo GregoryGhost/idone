@@ -6,8 +6,25 @@ module Tests =
     open Idone.Security
     open Idone.Tests.Extensions
     open LanguageExt
+    open Idone.DAL.DTO
+    open Idone.DAL.Dictionaries
+    open Idone.Back
+    open Microsoft.AspNetCore.Hosting
+    open Microsoft.Extensions.Configuration
 
-    let private _security = new EnterPoint() :> ISecurityModule
+    let private _security =
+        let config = new ConfigurationBuilder()
+        config.AddJsonFile("appsettings.Development.json")
+        let factory = 
+            let builder = new WebHostBuilder()
+            builder.UseConfiguration(config.Build())
+                .UseKestrel()
+                .UseStartup<Startup>()
+            let host = builder.Build()
+            host.Run()
+            host
+        
+        new EnterPoint(factory.Services) :> ISecurityModule
 
     let (>>=) (x : Either<'L,'R>) (f: ('R -> Either<'L, 'B>)) =
         x.Bind(f)

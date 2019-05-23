@@ -1,7 +1,7 @@
 ﻿namespace Idone.Back
 {
     using Idone.DAL.Base;
-
+    using Idone.Security;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
@@ -35,7 +35,8 @@
             var connString = Configuration.GetConnectionString("default");
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).Services
                     .AddIdoneIdentity()
-                    .AddIdoneDb(connString);
+                    .AddIdoneDb(connString)
+                    .AddSecurityDi();
         }
     }
 }

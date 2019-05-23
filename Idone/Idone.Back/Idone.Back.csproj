@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Idone.Core\Idone.Core.csproj" />
     <ProjectReference Include="..\Idone.DAL\Idone.DAL.csproj" />
+    <ProjectReference Include="..\Idone.Security\Idone.Security.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,8 @@
 ﻿namespace Idone.DAL.Entities
 {
+    using Idone.DAL.Dictionaries;
+    using Idone.DAL.DTO;
+
     using LanguageExt;
 
     using Microsoft.AspNetCore.Identity;
@@ -32,6 +35,13 @@
         {
             return !(x == y);
         }
+
+        public static Either<Error, User> Create(DtoRegistrateUser registrateUser)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string DisplayName { get; private set; }
     }
 
     public class FullName
