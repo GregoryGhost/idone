@@ -21,9 +21,11 @@ module Tests =
             //2.Получить данные требуемого пользователя у AD сервера
             //3.Передать данные пользователя на регистрацию в системе
             //4.Найти зареганного пользователя в системе (в гриде всех пользователей)
-          
-          let findDomainUser =
-            _security.FindUserByDisplayName
+            
+          let findFirstDomainUser searchExpression =
+            let takeFirstUser = Seq.cast<DtoAdUser> >> Seq.head >> LanguageExt.Prelude.Right<Error, DtoAdUser>
+            searchExpression |> _security.FindUsersByDisplayName
+            >>= takeFirstUser
 
           let fillUserCredentials (userData : DtoAdUser) : DtoRegistrateUser =
             new DtoRegistrateUser(
@@ -60,7 +62,7 @@ module Tests =
           let searchExpression = "Кулаков*"
           let registratedUser : Either<Error, DtoRowUser> = 
             searchExpression 
-            |> findDomainUser 
+            |> findFirstDomainUser 
             >>= (fillUserCredentials >> registrateUser) 
             >>= findRegistratedUser
 
