@@ -9,6 +9,7 @@ module Tests =
     open Idone.DAL.DTO
     open Idone.DAL.Dictionaries
     open Idone.DAL.Base
+    open Idone.DAL.Base.Extensions
     open Microsoft.Extensions.Configuration
     open Microsoft.Extensions.DependencyInjection
 
@@ -36,6 +37,12 @@ module Tests =
     let tests =
       let _servicesProvider = initTestEnviroment()
       let _security = new EnterPoint(_servicesProvider) :> ISecurityModule
+
+      let clearUsers() =
+        let dbContext = _servicesProvider.GetService<AppContext>()
+        dbContext.Users.Clear()
+        dbContext.SaveChanges()
+
       testList "Модуль админки" [       
         test "Регистрация нового пользователя" {
             //1.Найти пользователя в домене (берем хардкод данные)
@@ -88,6 +95,7 @@ module Tests =
             >>= findRegistratedUser
 
           Expect.isRight registratedUser "Пользователь не зарегистрирован"
+          clearUsers() |> ignore
         }
         //TODO: добавить тесты для проверки работы с ролями, правами, пользователями
       ]

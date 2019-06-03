@@ -1,23 +1,27 @@
 ﻿namespace Idone.DAL.Base.Extensions
 {
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-
-    using Idone.DAL.Dictionaries;
-
     using LanguageExt;
-    using LanguageExt.SomeHelp;
-
-    using static LanguageExt.Prelude;
 
     using Microsoft.EntityFrameworkCore;
+
+    using static LanguageExt.Prelude;
 
     /// <summary>
     /// Расширения для репозитория EF Core.
     /// </summary>
     public static class DbSetExtension
     {
+        /// <summary>
+        /// Очистить таблицу.
+        /// </summary>
+        /// <typeparam name="T"> Тип сущностей таблицы. </typeparam>
+        /// <param name="dbSet"> Репозиторий. </param>
+        public static void Clear<T>(this DbSet<T> dbSet)
+            where T : class
+        {
+            dbSet.RemoveRange(dbSet);
+        }
+
         /// <summary>
         /// Найти объект.
         /// </summary>

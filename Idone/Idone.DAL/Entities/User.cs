@@ -5,6 +5,8 @@
 
     using LanguageExt;
 
+    using static LanguageExt.Prelude;
+
     using Microsoft.AspNetCore.Identity;
 
     /// <summary>
@@ -21,7 +23,7 @@
         {
         }
 
-        public User(FullName fullName)
+        private User(FullName fullName)
         {
             FullName = fullName;
         }
@@ -38,7 +40,11 @@
 
         public static Either<Error, User> Create(DtoRegistrateUser registrateUser)
         {
-            throw new System.NotImplementedException();
+            var user = new User(new FullName(registrateUser.Surname, registrateUser.Name, registrateUser.Patronomic));
+            user.DisplayName = "kek";
+            user.Email = registrateUser.Email;
+            user.UserName = registrateUser.Email;
+            return Right<Error, User>(user);
         }
 
         public string DisplayName { get; private set; }
