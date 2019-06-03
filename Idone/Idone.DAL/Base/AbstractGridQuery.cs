@@ -10,7 +10,12 @@
     /// <typeparam name="TFilter"> Тип фильтра записей. </typeparam>
     public abstract class AbstractGridQuery<TFilter> : Record<AbstractGridQuery<TFilter>>
     {
-        public AbstractGridQuery(TFilter filter, Pagination pagination)
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
+        /// <param name="filter"> Фильтр. </param>
+        /// <param name="pagination"> Настройки постраничного вывода. </param>
+        protected AbstractGridQuery(TFilter filter, Pagination pagination)
         {
             Filter = filter;
             Pagination = pagination;

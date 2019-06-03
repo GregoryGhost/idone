@@ -5,7 +5,6 @@
     using System.DirectoryServices.AccountManagement;
     using System.Linq;
 
-    using Idone.Core;
     using Idone.DAL.Dictionaries;
     using Idone.DAL.DTO;
     using Idone.Security.Services;
@@ -16,21 +15,26 @@
 
     using static LanguageExt.Prelude;
 
+    /// <summary>
+    /// Точка входа модуля "Администрирование".
+    /// </summary>
     public class EnterPoint : ISecurityModule
     {
+        /// <summary>
+        /// Сервис по работе с пользователями.
+        /// </summary>
         private readonly UserService _userService;
+
+        /// <summary>
+        /// Конструктор с инициализацией зависимостей модуля.
+        /// </summary>
+        /// <param name="serviceProvider"> Коллекция сервисов. </param>
         public EnterPoint(IServiceProvider serviceProvider)
         {
             _userService = serviceProvider.GetService<UserService>();
         }
 
-        public Either<Error, DtoRegistratedUser> RegistrateUser(DtoRegistrateUser registrateUser)
-        {
-            var result = _userService.RegistrateUser(registrateUser);
-
-            return result;
-        }
-
+        /// <inheritdoc />
         public Either<Error, IEnumerable<DtoAdUser>> FindUsersByDisplayName(string searchExpression)
         {
             //TODO: выделить в метод сервиса AdService
@@ -39,16 +43,34 @@
             {
                 DisplayName = searchExpression
             };
-            var foundUsers = new PrincipalSearcher(query).FindAll()
-                .Where(user => user.DisplayName != null)
-                .Select(user => new DtoAdUser(user.Sid.Value, "", user.Name, "", "tipo@mail.ru"));
+
+            var foundUsers = new PrincipalSearcher(query).FindAll().Where(user => user.DisplayName != null).Select(
+                userData =>
+                {
+                    var user = userData as UserPrincipal;
+                    return new DtoAdUser(
+                        user?.Sid.Value,
+                        user?.Surname,
+                        user?.GivenName,
+                        user?.MiddleName ?? string.Empty,
+                        user?.EmailAddress);
+                });
 
             return Right<Error, IEnumerable<DtoAdUser>>(foundUsers);
         }
 
+        /// <inheritdoc />
         public Either<Error, DtoGridUser> GetGridUser(DtoGridQueryUser gridQueryUser)
         {
             var result = _userService.GetGridUser(gridQueryUser);
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoRegistratedUser> RegistrateUser(DtoRegistrateUser registrateUser)
+        {
+            var result = _userService.RegistrateUser(registrateUser);
 
             return result;
         }

@@ -12,15 +12,30 @@
 
     using static LanguageExt.Prelude;
 
+    /// <summary>
+    /// Сервис по работе с пользователями.
+    /// </summary>
     internal class UserService
     {
+        /// <summary>
+        /// Контекст БД.
+        /// </summary>
         public readonly AppContext _appContext;
 
+        /// <summary>
+        /// Инициализировать зависимости.
+        /// </summary>
+        /// <param name="appContext"> Контекст БД. </param>
         public UserService(AppContext appContext)
         {
             _appContext = appContext;
         }
 
+        /// <summary>
+        /// Получить табличные данные пользователей.
+        /// </summary>
+        /// <param name="gridQuery"> Запрос на формирование табличных записей. </param>
+        /// <returns> Возвращает монаду табличных записей пользователей. </returns>
         public Either<Error, DtoGridUser> GetGridUser(DtoGridQueryUser gridQuery)
         {
             var dbQuery = _appContext.Users.AsQueryable();
@@ -35,6 +50,11 @@
             return Right<Error, DtoGridUser>(result);
         }
 
+        /// <summary>
+        /// Зарегистрировать пользователя.
+        /// </summary>
+        /// <param name="registrateUser"> Регистрационные данные пользователя. </param>
+        /// <returns> Возвращает монаду зарегистрированного пользователя. </returns>
         public Either<Error, DtoRegistratedUser> RegistrateUser(DtoRegistrateUser registrateUser)
         {
             //TODO: выглядит как-то не очень,

@@ -29,10 +29,6 @@ module Tests =
         rootServiceProvider
 
 
-    let (>>=) (x : Either<'L,'R>) (f: ('R -> Either<'L, 'B>)) =
-        x.Bind(f)
-
-
     [<Tests>]
     let tests =
       let _servicesProvider = initTestEnviroment()
@@ -76,17 +72,13 @@ module Tests =
             let query = new DtoGridQueryUser(filter, FIRST_PAGE)
             query
 
-          let toEither (x : 'R option) (error : 'L) : Either<'L, 'R> =
-            match x with
-            | Some y -> LanguageExt.Prelude.Right<'L, 'R>(y)
-            | None -> LanguageExt.Prelude.Left<'L, 'R>(error)
           let findRegistratedUser (user : DtoRegistratedUser) : Either<Error, DtoRowUser> =
             let convert x = toEither x Error.Exception
             let findUser = getUsers >> Seq.tryFind (fun u -> u.Email = user.Email) >> convert
             let gridQueryUser = new DtoUserFilter(user.Email) |> fillGridQueryUser
             gridQueryUser |> _security.GetGridUser >>= findUser
 
-          //user cases
+          //use cases
           let searchExpression = "Кулаков*"
           let registratedUser : Either<Error, DtoRowUser> = 
             searchExpression 
@@ -94,8 +86,8 @@ module Tests =
             >>= (fillUserCredentials >> registrateUser) 
             >>= findRegistratedUser
 
-          Expect.isRight registratedUser "Пользователь не зарегистрирован"
-          clearUsers() |> ignore
+          Expecto.isRight registratedUser "Пользователь не зарегистрирован"
+          //clearUsers() |> ignore
         }
         //TODO: добавить тесты для проверки работы с ролями, правами, пользователями
       ]

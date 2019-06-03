@@ -1,11 +1,18 @@
-﻿namespace Idone.Security
+﻿namespace Idone.DAL.DTO
 {
     using Idone.DAL.Base;
-    using Idone.DAL.DTO;
 
+    /// <summary>
+    /// DTO для формирования запроса табличных записей.
+    /// </summary>
     public class DtoGridQueryUser : AbstractGridQuery<DtoUserFilter>
     {
-        public DtoGridQueryUser(DtoUserFilter filter, Pagination pagination) 
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
+        /// <param name="filter"> Фильтр пользователей. </param>
+        /// <param name="pagination"> Настройки постраничного вывода пользователей. </param>
+        public DtoGridQueryUser(DtoUserFilter filter, Pagination pagination)
             : base(filter, pagination)
         {
         }

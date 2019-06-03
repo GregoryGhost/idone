@@ -1,6 +1,7 @@
 ﻿namespace Idone.Tests.Extensions
 
-module Expect =
+[<AutoOpen>]
+module Expecto =
     open LanguageExt
     open Expecto
 

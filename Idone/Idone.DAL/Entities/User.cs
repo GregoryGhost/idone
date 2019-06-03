@@ -1,21 +1,21 @@
 ﻿namespace Idone.DAL.Entities
 {
+    using System.Linq;
+
     using Idone.DAL.Dictionaries;
     using Idone.DAL.DTO;
 
     using LanguageExt;
 
-    using static LanguageExt.Prelude;
-
     using Microsoft.AspNetCore.Identity;
+
+    using static LanguageExt.Prelude;
 
     /// <summary>
     /// Пользователь.
     /// </summary>
     public class User : IdentityUser<int>
     {
-        public FullName FullName { get; private set; }
-
         /// <summary>
         /// Конструктор для EF Core.
         /// </summary>
@@ -23,53 +23,67 @@
         {
         }
 
-        private User(FullName fullName)
+        /// <summary>
+        /// Отображаемое имя пользователя (сокращенное).
+        /// </summary>
+        public string DisplayName { get; private set; }
+
+        /// <summary>
+        /// Полное имя пользователя.
+        /// </summary>
+        public FullName FullName { get; private set; }
+
+        /// <summary>
+        /// Создать пользователя.
+        /// </summary>
+        /// <param name="registrateUser"> DTO с регистрационными данными пользователя. </param>
+        /// <returns> Возвращает результат создания. </returns>
+        public static Either<Error, User> Create(DtoRegistrateUser registrateUser)
         {
-            FullName = fullName;
+            var user = new User
+            {
+                DisplayName = GetDisplayName(registrateUser),
+                Email = registrateUser.Email,
+                UserName = registrateUser.Email,
+                FullName = new FullName(registrateUser.Surname, registrateUser.Name, registrateUser.Patronomic)
+            };
+
+            return Right<Error, User>(user);
         }
 
+        /// <summary>
+        /// Сравнение пользователей.
+        /// </summary>
+        /// <param name="x"> Первый пользователь. </param>
+        /// <param name="y"> Второй пользователь. </param>
+        /// <returns> Возвращает результат сравнения. </returns>
         public static bool operator ==(User x, User y)
         {
             return RecordType<User>.EqualityTyped(x, y);
         }
 
+        /// <summary>
+        /// Сравнение пользователей.
+        /// </summary>
+        /// <param name="x"> Первый пользователь. </param>
+        /// <param name="y"> Второй пользователь. </param>
+        /// <returns> Возвращает результат сравнения. </returns>
         public static bool operator !=(User x, User y)
         {
             return !(x == y);
         }
 
-        public static Either<Error, User> Create(DtoRegistrateUser registrateUser)
-        {
-            var user = new User(new FullName(registrateUser.Surname, registrateUser.Name, registrateUser.Patronomic));
-            user.DisplayName = "kek";
-            user.Email = registrateUser.Email;
-            user.UserName = registrateUser.Email;
-            return Right<Error, User>(user);
-        }
-
-        public string DisplayName { get; private set; }
-    }
-
-    public class FullName
-    {
-        public string Name { get; private set; }
-
-        public string Patronymic { get; private set; }
-
-        public string Surname { get; private set; }
-
         /// <summary>
-        /// Конструктор для EF Core.
+        /// Сформировать отображаемое имя пользователя.
         /// </summary>
-        private FullName()
+        /// <param name="registrateUser"> Регистрационные данные. </param>
+        /// <returns> Возвращает отображаемое имя пользователя. </returns>
+        private static string GetDisplayName(DtoRegistrateUser registrateUser)
         {
-        }
-
-        public FullName(string surname, string name, string patronymic)
-        {
-            Surname = surname;
-            Name = name;
-            Patronymic = patronymic;
+            var patronomic = string.IsNullOrEmpty(registrateUser.Patronomic)
+                ? string.Empty
+                : $"{registrateUser.Patronomic.First()}.";
+            return $"{registrateUser?.Surname} {registrateUser?.Name.First()}. {patronomic}";
         }
     }
 }
