@@ -20,8 +20,12 @@ module Tests =
         let services = new ServiceCollection()
         services.AddIdoneIdentity()
             .AddIdoneDb(connString)
-            .AddSecurityDi()
-            .BuildServiceProvider()
+            .AddSecurityDi() |> ignore
+        let rootServiceProvider = services.BuildServiceProvider()
+        use scope = rootServiceProvider.CreateScope()
+        scope.ServiceProvider.GetRequiredService<AppContext>().InitTest()
+
+        rootServiceProvider
 
 
     let (>>=) (x : Either<'L,'R>) (f: ('R -> Either<'L, 'B>)) =
