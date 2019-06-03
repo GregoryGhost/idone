@@ -8,23 +8,21 @@ module Tests =
     open LanguageExt
     open Idone.DAL.DTO
     open Idone.DAL.Dictionaries
-    open Idone.Back
-    open Microsoft.AspNetCore.Hosting
+    open Idone.DAL.Base
     open Microsoft.Extensions.Configuration
+    open Microsoft.Extensions.DependencyInjection
 
-    let private _security =
+    let private initTestEnviroment() =
         let config = new ConfigurationBuilder()
-        config.AddJsonFile("appsettings.Development.json")
-        let factory = 
-            let builder = new WebHostBuilder()
-            builder.UseConfiguration(config.Build())
-                .UseKestrel()
-                .UseStartup<Startup>()
-            let host = builder.Build()
-            host.Run()
-            host
-        
-        new EnterPoint(factory.Services) :> ISecurityModule
+        config.AddJsonFile("appsettings.Development.json") |> ignore
+        let connString = config.Build().GetConnectionString("default")
+
+        let services = new ServiceCollection()
+        services.AddIdoneIdentity()
+            .AddIdoneDb(connString)
+            .AddSecurityDi()
+            .BuildServiceProvider()
+
 
     let (>>=) (x : Either<'L,'R>) (f: ('R -> Either<'L, 'B>)) =
         x.Bind(f)
@@ -32,6 +30,8 @@ module Tests =
 
     [<Tests>]
     let tests =
+      let _servicesProvider = initTestEnviroment()
+      let _security = new EnterPoint(_servicesProvider) :> ISecurityModule
       testList "Модуль админки" [       
         test "Регистрация нового пользователя" {
             //1.Найти пользователя в домене (берем хардкод данные)
