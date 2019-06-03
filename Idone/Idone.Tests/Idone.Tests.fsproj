@@ -25,7 +25,7 @@
     <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="10.0.2" />
     <PackageReference Include="FSharp.Core" Version="4.6.2" />
     <PackageReference Include="LanguageExt.FSharp" Version="3.1.21" />
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.5" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
     <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
