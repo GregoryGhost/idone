@@ -79,15 +79,43 @@ module Tests =
             gridQueryUser |> _security.GetGridUser >>= findUser
 
           //use cases
-          let searchExpression = "Кулаков*"
+          let SEARCH_EXPRESSION = "Кулаков*"
           let registratedUser : Either<Error, DtoRowUser> = 
-            searchExpression 
-            |> findFirstDomainUser 
+            SEARCH_EXPRESSION
+            |> findFirstDomainUser
             >>= (fillUserCredentials >> registrateUser) 
             >>= findRegistratedUser
 
-          Expecto.isRight registratedUser "Пользователь не зарегистрирован"
-          //clearUsers() |> ignore
+          Expect.isRight registratedUser "Пользователь не зарегистрирован"
+          clearUsers() |> ignore
+        }
+
+        test "Назначение ролей пользователю" {
+            //1. Зарегистрировать пользователя
+            //2. Создать роли
+            //3. Назначить роли пользователю
+            //4. Получить роли пользователя
+            //5. Получить пользователя из всех назначенных ролей
+            Expect.equal 1 1
+        }
+
+        test "Назначение прав для роли" {
+            //1. Создать роли
+            //2. Назначить права для роли
+            //3. Получить права роли
+            //4. Получить роль из всех назначенных прав
+            Expect.equal 1 1
+        }
+
+        test "Назначены права для пользователя(через роли)" {
+            //1. Зарегистрировать пользователя
+            //2. Создать роли
+            //3. Назначить права для роли
+            //3. Назначить роли пользователю
+            //4. Получить роли пользователя
+            //5. Получить права ролей
+            //6. Получить права пользователя
+            Expect.equal 1 1
         }
         //TODO: добавить тесты для проверки работы с ролями, правами, пользователями
       ]
