@@ -14,3 +14,8 @@ module LanguageExtExtension =
     let (>>=) (x : Either<'L,'R>) (func: ('R -> Either<'L, 'B>)) =
         x.Bind(func)
 
+
+    type EitherBuilder () =
+        member __.Bind(x, f) = x >>= f
+        member __.ReturnFrom x = x
+

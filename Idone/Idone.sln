@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Idone.Back", "Idone.Back\Id
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Idone.Tests", "Idone.Tests\Idone.Tests.fsproj", "{D40D00BB-0F6F-4F91-B627-AF7438E19E93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Idone.Security", "Idone.Security\Idone.Security.csproj", "{2EDCF030-3340-4296-B366-DFF2B1238BF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Idone.Security", "Idone.Security\Idone.Security.csproj", "{2EDCF030-3340-4296-B366-DFF2B1238BF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Idone.Core", "Idone.Core\Idone.Core.csproj", "{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Idone.Core", "Idone.Core\Idone.Core.csproj", "{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Idone.DAL", "Idone.DAL\Idone.DAL.csproj", "{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Idone.DAL", "Idone.DAL\Idone.DAL.csproj", "{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

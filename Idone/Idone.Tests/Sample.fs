@@ -6,12 +6,17 @@ module Tests =
     open Idone.Security
     open Idone.Tests.Extensions
     open LanguageExt
+
     open Idone.DAL.DTO
     open Idone.DAL.Dictionaries
     open Idone.DAL.Base
     open Idone.DAL.Base.Extensions
+
     open Microsoft.Extensions.Configuration
     open Microsoft.Extensions.DependencyInjection
+    open Idone.Tests.Helpers
+    open Idone.Tests.Helpers.IdoneApiHelper
+
 
     let private initTestEnviroment() =
         let config = new ConfigurationBuilder()
@@ -32,7 +37,7 @@ module Tests =
     [<Tests>]
     let tests =
       let _servicesProvider = initTestEnviroment()
-      let _security = new EnterPoint(_servicesProvider) :> ISecurityModule
+      let _security = new SecurityModuleWrapper(_servicesProvider)
 
       let clearUsers() =
         let dbContext = _servicesProvider.GetService<AppContext>()
@@ -45,46 +50,14 @@ module Tests =
             //2.Получить данные требуемого пользователя у AD сервера
             //3.Передать данные пользователя на регистрацию в системе
             //4.Найти зареганного пользователя в системе (в гриде всех пользователей)
-            
-          let findFirstDomainUser searchExpression =
-            let takeFirstUser = Seq.cast<DtoAdUser> >> Seq.head >> LanguageExt.Prelude.Right<Error, DtoAdUser>
-            searchExpression |> _security.FindUsersByDisplayName
-            >>= takeFirstUser
-
-          let fillUserCredentials (userData : DtoAdUser) : DtoRegistrateUser =
-            new DtoRegistrateUser(
-                userData.Sid,
-                userData.Surname,
-                userData.Name,
-                userData.Patronomic,
-                userData.Email)
-          
-          let registrateUser =
-            _security.RegistrateUser
-
-          let getUsers (gridUser : DtoGridUser) : DtoRowUser seq = 
-            gridUser.Rows
-
-          let FIRST_PAGE = new Pagination(10, 1)
-
-          let fillGridQueryUser (user : DtoUserFilter) : DtoGridQueryUser =
-            let filter = new DtoUserFilter(user.Email)
-            let query = new DtoGridQueryUser(filter, FIRST_PAGE)
-            query
-
-          let findRegistratedUser (user : DtoRegistratedUser) : Either<Error, DtoRowUser> =
-            let convert x = toEither x Error.Exception
-            let findUser = getUsers >> Seq.tryFind (fun u -> u.Email = user.Email) >> convert
-            let gridQueryUser = new DtoUserFilter(user.Email) |> fillGridQueryUser
-            gridQueryUser |> _security.GetGridUser >>= findUser
 
           //use cases
           let SEARCH_EXPRESSION = "Кулаков*"
           let registratedUser : Either<Error, DtoRowUser> = 
             SEARCH_EXPRESSION
-            |> findFirstDomainUser
-            >>= (fillUserCredentials >> registrateUser) 
-            >>= findRegistratedUser
+            |> _security.FindFirstDomainUser
+            >>= (fillUserCredentials >> _security.RegistrateUser)
+            >>= _security.FindRegistratedUser
 
           Expect.isRight registratedUser "Пользователь не зарегистрирован"
           clearUsers() |> ignore
@@ -96,6 +69,26 @@ module Tests =
             //3. Назначить роли пользователю
             //4. Получить роли пользователя
             //5. Получить пользователя из всех назначенных ролей
+            //let registratedUser : Either<Error, DtoRegistratedUser> = 
+            //    registrateUserOnDomainUser SEARCH_EXPRESSION
+                
+            //let userRoles : Either<Error, DtoGridRole> = 
+            //    let createdRoles : Either<Error, DtoGridRole> =
+            //        ROLES |> prepareRoleData >>= createRoles
+            //    createdRoles >>= setRolesForUser >>= getRolesOfUser
+
+            //let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =
+            //    records
+            //    |> Seq.distinct
+            //    |> Seq.tryExactlyOne
+
+            //let foundUsersOfRoles : Either<Error, DtoGridUser> =
+            //    let getUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoRowUser> =
+            //        roles 
+            //        |> Seq.map getUsersByRole
+            //        |> flattenDuplicates
+            //    ROLES |> getGridRole >>= getUsersOfRoles
+
             Expect.equal 1 1
         }
 
@@ -115,6 +108,7 @@ module Tests =
             //4. Получить роли пользователя
             //5. Получить права ролей
             //6. Получить права пользователя
+            //7. Получить пользователей для права
             Expect.equal 1 1
         }
         //TODO: добавить тесты для проверки работы с ролями, правами, пользователями
