@@ -53,11 +53,12 @@ module Tests =
 
           //use cases
           let SEARCH_EXPRESSION = "Кулаков*"
-          let registratedUser : Either<Error, DtoRowUser> = 
-            SEARCH_EXPRESSION
-            |> _security.FindFirstDomainUser
-            >>= (fillUserCredentials >> _security.RegistrateUser)
-            >>= _security.FindRegistratedUser
+          let registratedUser = either {
+            let! firstDomainUser = _security.FindFirstDomainUser SEARCH_EXPRESSION
+            let! registratedUser = 
+                firstDomainUser |> (fillUserCredentials >> _security.RegistrateUser)
+            return! registratedUser |> _security.FindRegistratedUser
+          }
 
           Expect.isRight registratedUser "Пользователь не зарегистрирован"
           clearUsers() |> ignore
