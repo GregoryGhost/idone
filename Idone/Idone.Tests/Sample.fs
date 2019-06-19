@@ -70,25 +70,30 @@ module Tests =
             //3. Назначить роли пользователю
             //4. Получить роли пользователя
             //5. Получить пользователя из всех назначенных ролей
-            //let registratedUser : Either<Error, DtoRegistratedUser> = 
-            //    registrateUserOnDomainUser SEARCH_EXPRESSION
+
                 
-            //let userRoles : Either<Error, DtoGridRole> = 
-            //    let createdRoles : Either<Error, DtoGridRole> =
-            //        ROLES |> prepareRoleData >>= createRoles
-            //    createdRoles >>= setRolesForUser >>= getRolesOfUser
+            let userRoles : Either<Error, DtoGridRole> = either {
+                let! registratedUser : DtoRegistratedUser = 
+                    registrateUserOnDomainUser SEARCH_EXPRESSION
+                let created : Dt=
+                    ROLES |> prepareRoleData
+                let! roles : DtoGridRole = createdRoles |> createRoles
+                let! resultSettedRoles = roles |> setRolesForUser
 
-            //let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =
-            //    records
-            //    |> Seq.distinct
-            //    |> Seq.tryExactlyOne
+                return! resultSettedRoles |> getRolesOfUser
+            }
 
-            //let foundUsersOfRoles : Either<Error, DtoGridUser> =
-            //    let getUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoRowUser> =
-            //        roles 
-            //        |> Seq.map getUsersByRole
-            //        |> flattenDuplicates
-            //    ROLES |> getGridRole >>= getUsersOfRoles
+            let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =
+                records
+                |> Seq.distinct
+                |> Seq.tryExactlyOne
+
+            let foundUsersOfRoles : Either<Error, DtoGridUser> =
+                let getUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoRowUser> =
+                    roles 
+                    |> Seq.map getUsersByRole
+                    |> flattenDuplicates
+                ROLES |> getGridRole >>= getUsersOfRoles
 
             Expect.equal 1 1
         }
