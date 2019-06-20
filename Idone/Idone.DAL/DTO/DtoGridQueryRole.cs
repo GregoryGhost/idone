@@ -2,6 +2,9 @@
 {
     using Idone.DAL.Base;
 
+    /// <summary>
+    /// DTO для формирования табличных записей.
+    /// </summary>
     public class DtoGridQueryRole : AbstractGridQuery<DtoRoleFilter>
     {
         /// <summary>
