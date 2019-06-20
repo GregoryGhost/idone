@@ -46,14 +46,14 @@
         /// </summary>
         /// <param name="linkRolePermissions"> DTO назначаемых прав для роли. </param>
         /// <returns> Возвращает монаду ?.</returns>
-        Either<Error, ?> AllowRolePermissions(DtoLinkRolePermissions linkRolePermissions);
+        Either<Error, Success> AllowRolePermissions(DtoLinkRolePermissions linkRolePermissions);
 
         /// <summary>
         /// Отнять права у роли.
         /// </summary>
         /// <param name="linkRolePermissions"> DTO отнимаемых прав у роли. </param>
         /// <returns> Возвращает монаду ?.</returns>
-        Either<Error, ?> DenyRolePermissions(DtoLinkRolePermissions linkRolePermissions);
+        Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions linkRolePermissions);
 
         /// <summary>
         /// Получить таблицу прав для роли.
@@ -74,14 +74,14 @@
         /// </summary>
         /// <param name="linkUserRoles"> DTO назначаемых ролей для пользователя. </param>
         /// <returns> Возвращает монаду ?</returns>
-        Either<Error, ?> SetUserRoles(DtoLinkUserRoles linkUserRoles);
+        Either<Error, Success> SetUserRoles(DtoLinkUserRoles linkUserRoles);
 
         /// <summary>
         /// Отнять роли у пользователя.
         /// </summary>
         /// <param name="linkUserRoles"> DTO отнимаемых ролей у пользователя. </param>
         /// <returns> Возвращает монаду ?</returns>
-        Either<Error, ?> UnsetUserRoles(DtoLinkUserRoles linkUserRoles);
+        Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles linkUserRoles);
 
         /// <summary>
         /// Получить роли.
