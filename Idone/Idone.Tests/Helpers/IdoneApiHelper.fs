@@ -7,6 +7,14 @@ module IdoneApiHelper =
 
 
     let FIRST_PAGE = new Pagination(10, 1)
+    
+    let ADMIN_AND_USER_ROLES =
+        [
+            { Name = "админ" }
+            { Name = "пользователь" }
+        ]
+        
+    let SEARCH_DEFAULT_USER = "Кулаков*"
 
 
     let fillUserCredentials (userData : DtoAdUser) : DtoRegistrateUser =
@@ -36,4 +44,12 @@ module IdoneApiHelper =
     let getUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoRowUser> =
         roles 
         |> Seq.map getUsersByRole
-        |> flattenDuplicates
+        |> flattenDuplicate
+    
+    let toDefaultGridQuery (user : DtoRegistratedUser) : DtoGridQueryUser =
+        let filter = new DtoUserFilter(user.Email)
+        let query = new DtoGridQueryUser(filter, FIRST_PAGE)
+        query
+        
+    let toDtos (roles : Role list) : DtoNewRole list =
+        roles |> List.map (fun role -> new DtoNewRole(role.Name))

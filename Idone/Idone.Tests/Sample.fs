@@ -52,10 +52,9 @@ module Tests =
             //4.Найти зареганного пользователя в системе (в гриде всех пользователей)
 
           //use cases
-          let SEARCH_EXPRESSION = "Кулаков*"
           let registratedUser = either {
             let! registratedUser =
-                _security.RegistrateUserOnDomainUser SEARCH_EXPRESSION
+                _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
             return! registratedUser |> _security.FindRegistratedUser
           }
 
@@ -69,21 +68,15 @@ module Tests =
             //3. Назначить роли пользователю
             //4. Получить роли пользователя
             //5. Получить пользователя из всех назначенных ролей
-
-            let ROLES =
-                [
-                    { Name = "админ" }
-                    { Name = "пользователь" }
-                ]
                 
             let userRoles : Either<Error, DtoGridRole> = either {
                 let! registratedUser = 
-                    _security.RegistrateUserOnDomainUser SEARCH_EXPRESSION
-                let! roles : DtoGridRole =
-                    ROLES |> prepareRoleData |> _security.CreateRoles
+                    _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
+                let! roles =
+                    ADMIN_AND_USER_ROLES |> prepareRoleData |> _security.CreateRoles
                 let! resultSettedRoles = _security.SetRolesForUser(ROLES, registratedUser)
 
-                return! resultSettedRoles |> getRolesOfUser
+                return! _security.GetUserRoles <| toDefaultGridQuery <| registratedUser
             }
 
             Expect.isRight userRoles "Не найдены пользовательские роли"

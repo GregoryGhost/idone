@@ -86,13 +86,13 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridRole> GetRolePermissions(DtoGridQueryRole gridQueryRole)
+        public Either<Error, DtoGridRole> GetGridRolePermissions(DtoGridQueryRole gridQueryRole)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridPermission> GetPermissionRoles(DtoGridQueryPermission gridQueryPermission)
+        public Either<Error, DtoGridPermission> GetGridPermissionRoles(DtoGridQueryPermission gridQueryPermission)
         {
             throw new NotImplementedException();
         }
@@ -110,25 +110,25 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridRole> GetRoles(DtoGridQueryRole gridQueryRole)
+        public Either<Error, DtoGridRole> GetGridRoles(DtoGridQueryRole gridQueryRole)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridPermission> GetPermissions(DtoGridQueryPermission gridQuerypermission)
+        public Either<Error, DtoGridPermission> GetGridPermissions(DtoGridQueryPermission gridQuerypermission)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridPermission> GetUserPermissions(DtoGridQueryUser gridQueryUserPermission)
+        public Either<Error, DtoGridPermission> GetGridUserPermissions(DtoGridQueryUser gridQueryUserPermission)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridRole> GetUserRoles(DtoGridQueryUser gridQueryUserRole)
+        public Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUser gridQueryUserRole)
         {
             throw new NotImplementedException();
         }

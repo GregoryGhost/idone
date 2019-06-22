@@ -17,13 +17,13 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     let _module = new EnterPoint(servicesProvider) :> ISecurityModule
     
     member __.RegistrateUser (registrateUser : DtoRegistrateUser) : Either<Error, DtoRegistratedUser> = 
-        _module.RegistrateUser
+        _module.RegistrateUser registrateUser
 
     member __.FindUsersByDisplayName (searchExpression : string) : Either<Error, DtoAdUser seq> =
-        _module.FindUsersByDisplayName
+        _module.FindUsersByDisplayName searchExpression
 
-    member __.GetGridUser (DtoGridQueryUser gridQueryUser) : Either<Error, DtoGridUser> =
-        _module.GetGridUser
+    member __.GetGridUser (gridQueryUser : DtoGridQueryUser) : Either<Error, DtoGridUser> =
+        _module.GetGridUser gridQueryUser
 
     member __.FindFirstDomainUser (searchExpression : string) : Either<Error, DtoAdUser> =
         let takeFirstUser = Seq.cast<DtoAdUser> >> Seq.head >> LanguageExt.Prelude.Right<Error, DtoAdUser>
@@ -46,8 +46,10 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         //TODO: реализовать
         
     member __.FoundUsersOfRoles (roles : Role list) : Either<Error, DtoGridUser> =
-        roles |> __.GetGridRole >>= __.GetUsersOfRoles
+        roles |> toDtos |> __.GetGridRole >>= __.GetUsersOfRoles
         
-    member __.GetGridRole () : =
-    
-    member __.GetUsersOfRoles () : =
+    member __.GetGridRoles (gridQueryRole : DtoGridQueryRole) : Either<Error, DtoGridRole> =
+        _module.GetGridRoles gridQueryRole
+        
+    member __.GetGridUserRoles (gridQueryRoleUser : DtoGridQueryUser) : Either<Error, DtoGridRole> =
+        _module.GetGridRoleUsers gridQueryRoleUser
