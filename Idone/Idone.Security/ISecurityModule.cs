@@ -97,20 +97,25 @@
         /// <returns> Возвращает монаду с табличными данными прав. </returns>
         Either<Error, DtoGridPermission> GetPermissions(DtoGridQueryPermission gridQuerypermission);
 
-        Either<Error, DtoGridPermission> GetUserPermissions(DtoGridQueryPermission gridQueryPermission);
+        /// <summary>
+        /// Получить права пользователя.
+        /// </summary>
+        /// <param name="gridQueryPermission"> Запро на получение табличных записей прав пользователя. </param>
+        /// <returns> Возвращает монадау с табличными данными прав пользователя. </returns>
+        Either<Error, DtoGridPermission> GetUserPermissions(DtoGridQueryUser gridQueryUserPermission);
 
         /// <summary>
         /// Получить роли пользователя.
         /// </summary>
         /// <param name="gridQueryRole"> Запрос на получение табличных записей ролей пользователя. </param>
         /// <returns> Возвращает монаду с табличными данными ролей пользователя. </returns>
-        Either<Error, DtoGridRole> GetUserRoles(DtoGridQueryRole gridQueryRole);
+        Either<Error, DtoGridRole> GetUserRoles(DtoGridQueryUser gridQueryUserRole);
 
         /// <summary>
         /// Получить пользователей роли.
         /// </summary>
         /// <param name="gridQueryUser"> Запрос на получение табличных записей пользователей роли. </param>
         /// <returns> Возвращает монаду с табличными данными пользователей роли. </returns>
-        Either<Error, DtoGridRole> GetRoleUsers(DtoGridQueryRole gridQueryUser);
+        Either<Error, DtoGridRole> GetRoleUsers(DtoGridQueryRole gridQueryRoleUser);
     }
 }
