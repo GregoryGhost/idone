@@ -53,3 +53,6 @@ module IdoneApiHelper =
         
     let toDtos (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
+        
+    let toQueryRoles (roles : Role list) : DtoQueryRole list =
+        roles |> List.map (fun role -> new DtoQueryRole(role.Name))

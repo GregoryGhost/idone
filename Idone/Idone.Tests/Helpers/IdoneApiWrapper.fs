@@ -43,7 +43,18 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         }
         
     member __.SetRolesForUser (roles : Role list, user : DtoRegistratedUser) : Either<Error, Success> =
-        //TODO: реализовать
+        either {
+            let findRoleId role =
+                role |> toQueryRoles |> __.GetGridRoles >>= List.head
+            let roleIds =
+                roles |> List.reduce (fun acc role -> either {
+                        let! foundRole = findRoleId role
+                        acc + foundRole.Id })
+            let! foundUser = user |> __.GetGridUser >>= List.head 
+            let linkUserRoles = new DtoLinkUserRoles(roleIds, foundUser.Id)
+            
+            return! __.SetUserRoles linkUserRoles
+        }     
         
     member __.FoundUsersOfRoles (roles : Role list) : Either<Error, DtoGridUser> =
         roles |> toDtos |> __.GetGridRole >>= __.GetUsersOfRoles
