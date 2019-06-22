@@ -54,9 +54,8 @@ module Tests =
           //use cases
           let SEARCH_EXPRESSION = "Кулаков*"
           let registratedUser = either {
-            let! firstDomainUser = _security.FindFirstDomainUser SEARCH_EXPRESSION
-            let! registratedUser = 
-                firstDomainUser |> (fillUserCredentials >> _security.RegistrateUser)
+            let! registratedUser =
+                _security.RegistrateUserOnDomainUser SEARCH_EXPRESSION
             return! registratedUser |> _security.FindRegistratedUser
           }
 
@@ -71,31 +70,23 @@ module Tests =
             //4. Получить роли пользователя
             //5. Получить пользователя из всех назначенных ролей
 
+            let ROLES =
+                [
+                    { Name = "админ" }
+                    { Name = "пользователь" }
+                ]
                 
             let userRoles : Either<Error, DtoGridRole> = either {
-                let! registratedUser : DtoRegistratedUser = 
-                    registrateUserOnDomainUser SEARCH_EXPRESSION
-                let created : Dt=
-                    ROLES |> prepareRoleData
-                let! roles : DtoGridRole = createdRoles |> createRoles
-                let! resultSettedRoles = roles |> setRolesForUser
+                let! registratedUser = 
+                    _security.RegistrateUserOnDomainUser SEARCH_EXPRESSION
+                let! roles : DtoGridRole =
+                    ROLES |> prepareRoleData |> _security.CreateRoles
+                let! resultSettedRoles = _security.SetRolesForUser(ROLES, registratedUser)
 
                 return! resultSettedRoles |> getRolesOfUser
             }
 
-            let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =
-                records
-                |> Seq.distinct
-                |> Seq.tryExactlyOne
-
-            let foundUsersOfRoles : Either<Error, DtoGridUser> =
-                let getUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoRowUser> =
-                    roles 
-                    |> Seq.map getUsersByRole
-                    |> flattenDuplicates
-                ROLES |> getGridRole >>= getUsersOfRoles
-
-            Expect.equal 1 1
+            Expect.isRight userRoles "Не найдены пользовательские роли"
         }
 
         test "Назначение прав для роли" {

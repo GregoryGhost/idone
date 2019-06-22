@@ -18,7 +18,7 @@
     /// <summary>
     /// Точка входа модуля "Администрирование".
     /// </summary>
-    public class EnterPoint : ISecurityModule
+    public sealed class EnterPoint : ISecurityModule
     {
         /// <summary>
         /// Сервис по работе с пользователями.
@@ -65,6 +65,78 @@
             var result = _userService.GetGridUser(gridQueryUser);
 
             return result;
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoCreatedRole> CreateRoles(DtoNewRole newRole)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, Success> AllowRolePermissions(DtoLinkRolePermissions linkRolePermissions)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions linkRolePermissions)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoGridRole> GetRolePermissions(DtoGridQueryRole gridQueryRole)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoGridPermission> GetPermissionRoles(DtoGridQueryPermission gridQueryPermission)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, Success> SetUserRoles(DtoLinkUserRoles linkUserRoles)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles linkUserRoles)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoGridRole> GetRoles(DtoGridQueryRole gridQueryRole)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoGridPermission> GetPermissions(DtoGridQueryPermission gridQuerypermission)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoGridPermission> GetUserPermissions(DtoGridQueryUser gridQueryUserPermission)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoGridRole> GetUserRoles(DtoGridQueryUser gridQueryUserRole)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoGridRole> GetRoleUsers(DtoGridQueryRole gridQueryRoleUser)
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc />

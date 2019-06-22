@@ -2,6 +2,8 @@
 
 module IdoneApiHelper =
     open Idone.DAL.DTO
+    
+    open LanguageExt
 
 
     let FIRST_PAGE = new Pagination(10, 1)
@@ -22,3 +24,16 @@ module IdoneApiHelper =
         let filter = new DtoUserFilter(user.Email)
         let query = new DtoGridQueryUser(filter, FIRST_PAGE)
         query
+        
+    let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =
+        records
+        |> Seq.distinct
+        |> Seq.tryExactlyOne
+        
+    let prepareRoleData (roles : Role list) : DtoNewRole list =
+        roles |> List.map (fun role -> new DtoNewRole(role.Name))
+        
+    let getUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoRowUser> =
+        roles 
+        |> Seq.map getUsersByRole
+        |> flattenDuplicates
