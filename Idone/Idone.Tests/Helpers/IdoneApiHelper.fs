@@ -55,5 +55,8 @@ module IdoneApiHelper =
         let query = new DtoGridQueryRole(filter, FIRST_PAGE)
         query
 
-    let takeFirst<'a> = 
-        Seq.cast<'a> >> Seq.head >> LanguageExt.Prelude.Right<Error, 'a>
+    let takeFirst (rows : 'a seq) : Either<Error, 'a> = 
+        rows |> Seq.cast<'a> |> Seq.head |> LanguageExt.Prelude.Right<Error, 'a>
+
+    let takeFirstRow (row : DtoGrid<'b>) : Either<Error, 'b> =
+        row.Rows |> takeFirst

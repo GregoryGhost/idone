@@ -45,15 +45,15 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.SetRolesForUser (roles : Role list, user : DtoRegistratedUser) : Either<Error, Success> =
         either {
             let findRoleId role =
-                role |> toDefaultGridQueryRole |> __.GetGridRoles >>= (fun x -> x.Rows |> Seq.head)
+                role |> toDefaultGridQueryRole |> __.GetGridRoles >>= takeFirstRow
             let roleIds =
                 roles |> List.reduce (fun acc role -> either {
                         let! foundRole = findRoleId role
                         acc + foundRole.Id })
-            let! foundUser = user |> __.GetGridUser >>= List.head 
+            let! foundUser = user |> toDefaultGridQueryUser |> __.GetGridUser >>= (fun x -> x.Rows |> takeFirst)
             let linkUserRoles = new DtoLinkUserRoles(roleIds, foundUser.Id)
             
-            return! __.SetUserRoles linkUserRoles
+            return! _module.SetUserRoles linkUserRoles
         }     
         
     member __.FoundUsersOfRoles (roles : Role list) : Either<Error, DtoGridUser> =
@@ -65,7 +65,13 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.GetGridUserRoles (gridQueryRoleUser : DtoGridQueryUser) : Either<Error, DtoGridRole> =
         _module.GetGridRoleUsers gridQueryRoleUser
 
-    member __.GetUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoGridRole> =
+    member __.GetUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoGridUser> =
         roles
         |> Seq.map __.GetGridUserRoles
         |> flattenDuplicates
+
+    member __.CreateRoles (newRoles : Role list) : Either<Error, DtoCreatedRole list> =
+        newRoles |> prepareRoleData 
+        //TODO: натыкаюсь на ту же проблему что и в __.SetRolesForUser
+        // а именно - возвращается монада, а нужно все записи собрать воедино
+        |> List.reduce (fun acc role -> acc + _module.CreateRoles <| role)

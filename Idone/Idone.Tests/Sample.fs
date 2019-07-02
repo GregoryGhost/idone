@@ -53,7 +53,7 @@ module Tests =
           //use cases
           let registratedUser = either {
             let! registratedUser =
-                _security.RegistrateUserOnDomainUser Idone.SEARCH_DEFAULT_USER
+                _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
             return! registratedUser |> _security.FindRegistratedUser
           }
 
@@ -72,11 +72,11 @@ module Tests =
                 let! registratedUser = 
                     _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
                 let! roles =
-                    ADMIN_AND_USER_ROLES |> prepareRoleData |> _security.CreateRoles
+                    ADMIN_AND_USER_ROLES |> _security.CreateRoles
                 let! resultSettedRoles = 
                     _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)
 
-                return! _security.GetGridUserRoles <| toDefaultGridQueryUser <| registratedUser
+                return! registratedUser |> toDefaultGridQueryUser |> _security.GetGridUserRoles
             }
 
             Expect.isRight userRoles "Не найдены пользовательские роли"
