@@ -2,7 +2,8 @@
 
 module IdoneApiHelper =
     open Idone.DAL.DTO
-    
+    open Idone.DAL.Dictionaries
+
     open LanguageExt
 
 
@@ -40,19 +41,19 @@ module IdoneApiHelper =
         
     let prepareRoleData (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
-        
-    let getUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoRowUser> =
-        roles 
-        |> Seq.map getUsersByRole
-        |> flattenDuplicate
     
-    let toDefaultGridQuery (user : DtoRegistratedUser) : DtoGridQueryUser =
+    let toDefaultGridQueryUser (user : DtoRegistratedUser) : DtoGridQueryUser =
         let filter = new DtoUserFilter(user.Email)
         let query = new DtoGridQueryUser(filter, FIRST_PAGE)
         query
         
-    let toDtos (roles : Role list) : DtoNewRole list =
+    let toRoleDtos (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
         
-    let toQueryRoles (roles : Role list) : DtoQueryRole list =
-        roles |> List.map (fun role -> new DtoQueryRole(role.Name))
+    let toDefaultGridQueryRole (role : Role) : DtoGridQueryRole =
+        let filter = new DtoRoleFilter(role.Name)
+        let query = new DtoGridQueryRole(filter, FIRST_PAGE)
+        query
+
+    let takeFirst<'a> = 
+        Seq.cast<'a> >> Seq.head >> LanguageExt.Prelude.Right<Error, 'a>

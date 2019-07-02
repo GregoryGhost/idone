@@ -1,4 +1,4 @@
-﻿namespace Idone.Security
+﻿namespace Idone.DAL.DTO
 {
     using LanguageExt;
 

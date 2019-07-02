@@ -134,7 +134,7 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridRole> GetRoleUsers(DtoGridQueryRole gridQueryRoleUser)
+        public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRole gridQueryRoleUser)
         {
             throw new NotImplementedException();
         }

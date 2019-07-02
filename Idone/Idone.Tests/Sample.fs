@@ -3,19 +3,18 @@ namespace Idone.Tests
 module Tests = 
 
     open Expecto
-    open Idone.Security
-    open Idone.Tests.Extensions
     open LanguageExt
 
     open Idone.DAL.DTO
     open Idone.DAL.Dictionaries
     open Idone.DAL.Base
     open Idone.DAL.Base.Extensions
+    open Idone.Tests.Extensions
+    open Idone.Tests.Helpers
+    open Idone.Tests.Helpers.IdoneApiHelper
 
     open Microsoft.Extensions.Configuration
     open Microsoft.Extensions.DependencyInjection
-    open Idone.Tests.Helpers
-    open Idone.Tests.Helpers.IdoneApiHelper
 
 
     let private initTestEnviroment() =
@@ -54,7 +53,7 @@ module Tests =
           //use cases
           let registratedUser = either {
             let! registratedUser =
-                _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
+                _security.RegistrateUserOnDomainUser Idone.SEARCH_DEFAULT_USER
             return! registratedUser |> _security.FindRegistratedUser
           }
 
@@ -74,9 +73,10 @@ module Tests =
                     _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
                 let! roles =
                     ADMIN_AND_USER_ROLES |> prepareRoleData |> _security.CreateRoles
-                let! resultSettedRoles = _security.SetRolesForUser(ROLES, registratedUser)
+                let! resultSettedRoles = 
+                    _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)
 
-                return! _security.GetUserRoles <| toDefaultGridQuery <| registratedUser
+                return! _security.GetGridUserRoles <| toDefaultGridQueryUser <| registratedUser
             }
 
             Expect.isRight userRoles "Не найдены пользовательские роли"
