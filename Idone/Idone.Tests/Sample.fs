@@ -5,6 +5,7 @@ module Tests =
     open Expecto
     open LanguageExt
 
+    open Idone.Security
     open Idone.DAL.DTO
     open Idone.DAL.Dictionaries
     open Idone.DAL.Base
@@ -71,7 +72,7 @@ module Tests =
             let userRoles : Either<Error, DtoGridRole> = either {
                 let! registratedUser = 
                     _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
-                let! roles =
+                let roles =
                     ADMIN_AND_USER_ROLES |> _security.CreateRoles
                 let! resultSettedRoles = 
                     _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)

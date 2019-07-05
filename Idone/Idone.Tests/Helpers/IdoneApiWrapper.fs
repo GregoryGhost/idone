@@ -45,16 +45,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         
     member __.SetRolesForUser (roles : Role list, user : DtoRegistratedUser) : Either<Error, Success> =
         either {
-            let findRoleId role =
-                role |> toDefaultGridQueryRole |> __.GetGridRoles >>= takeFirstRow
-            let roleIds : int seq =
-                //TODO: проще - рефакторинг
-                ([], roles) ||> List.fold (fun (acc : Either<Error, DtoRowRole> list) (role : Role) -> either {
-                        let foundRole = findRoleId role
-                        return! foundRole :: acc })
-                |> reduceAllRights 
-                |> Seq.fold (fun acc role -> role.Id :: acc) [] 
-                |> List.toSeq
+            let roleIds = __.GetRoleIds roles
             let! foundUser = user |> toDefaultGridQueryUser |> __.GetGridUser >>= takeFirstRow
             let linkUserRoles = new DtoLinkUserRoles(foundUser.Id, roleIds)
             
@@ -62,7 +53,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         }     
         
     member __.FoundUsersOfRoles (roles : Role list) : Either<Error, DtoGridUser> =
-        roles |> toRoleDtos |> __.GetGridRoles >>= __.GetUsersOfRoles
+        roles |> List.map (toDefaultGridQueryRole >> __.GetGridRoles) >>= __.GetUsersOfRoles
         
     member __.GetGridRoles (gridQueryRole : DtoGridQueryRole) : Either<Error, DtoGridRole> =
         _module.GetGridRoles gridQueryRole
@@ -81,3 +72,16 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
                 return! (_module.CreateRoles role) :: acc}) []
         |> reduceAllRights
         |> Seq.toList
+
+    member __.FindRole (role : Role) : Either<Error, DtoRowRole> =
+        role |> toDefaultGridQueryRole |> __.GetGridRoles >>= takeFirstRow
+
+    member __.GetRoleIds (roles : Role list) : int seq =
+        ([], roles) ||> List.fold (fun acc role -> 
+            either {
+                let foundRole = __.FindRole role
+                return! foundRole :: acc
+            })
+        |> reduceAllRights 
+        |> Seq.fold (fun acc role -> role.Id :: acc) [] 
+        |> List.toSeq
