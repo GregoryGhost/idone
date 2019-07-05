@@ -23,3 +23,7 @@ module LanguageExtExtension =
     /// Вычислительное выражение для монады Either из LanguageExt
     let either = new EitherBuilder()
 
+    let reduceAllRights (list : Either<'l, 'r> seq) : 'r seq =
+        list.Rights()
+        
+

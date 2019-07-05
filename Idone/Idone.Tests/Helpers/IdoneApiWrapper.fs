@@ -11,6 +11,7 @@ open Idone.Tests.Extensions
 open Idone.Tests.Helpers.IdoneApiHelper
 
 open Idone.Security
+open LanguageExt
 
 
 type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
@@ -47,11 +48,13 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
             let findRoleId role =
                 role |> toDefaultGridQueryRole |> __.GetGridRoles >>= takeFirstRow
             let roleIds =
-                roles |> List.reduce (fun acc role -> either {
-                        let! foundRole = findRoleId role
-                        acc + foundRole.Id })
-            let! foundUser = user |> toDefaultGridQueryUser |> __.GetGridUser >>= (fun x -> x.Rows |> takeFirst)
-            let linkUserRoles = new DtoLinkUserRoles(roleIds, foundUser.Id)
+                //TODO: проще - рефакторинг
+                ([], roles) ||> List.fold (fun (acc : Either<Error, int> list) (role : Role) -> either {
+                        let foundRole = findRoleId role
+                        return! foundRole.Id :: acc })
+                |> reduceAllRights
+            let! foundUser = user |> toDefaultGridQueryUser |> __.GetGridUser >>= takeFirstRow
+            let linkUserRoles = new DtoLinkUserRoles(foundUser.Id, roleIds)
             
             return! _module.SetUserRoles linkUserRoles
         }     

@@ -44,7 +44,7 @@
             if (!string.IsNullOrWhiteSpace(filter.Email))
                 dbQuery = dbQuery.Where(user => user.Email == filter.Email);
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(user => new DtoRowUser(user.Email, user.DisplayName));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(user => new DtoRowUser(user.Email, user.DisplayName, user.Id));
             var result = new DtoGridUser(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridUser>(result);

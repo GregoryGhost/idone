@@ -11,10 +11,17 @@ namespace Idone.DAL.DTO
         /// Конструктор по умолчанию.
         /// </summary>
         /// <param name="name"> Название роли. </param>
-        public DtoRowRole(string name)
+        /// <param name="id"> Идентификатор роли. </param>
+        public DtoRowRole(string name, int id)
         {
             Name = name;
+            Id = id;
         }
+
+        /// <summary>
+        /// Идентификатор роли.
+        /// </summary>
+        public int Id { get; }
 
         /// <summary>
         /// Название роли.
