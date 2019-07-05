@@ -52,13 +52,15 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
             return! _module.SetUserRoles linkUserRoles
         }     
         
-    member __.FoundUsersOfRoles (roles : Role list) : Either<Error, DtoGridUser> =
-        roles |> List.map (toDefaultGridQueryRole >> __.GetGridRoles) >>= __.GetUsersOfRoles
+    member __.FoundUsersOfRoles (roles : Role list) : DtoGridUser list =
+        roles 
+        |> List.map (fun x -> x |> toDefaultGridQueryRole |> __.GetGridRoles >>= __.GetUsersOfRoles) 
+        |> reduceAllRights |> Seq.toList
         
     member __.GetGridRoles (gridQueryRole : DtoGridQueryRole) : Either<Error, DtoGridRole> =
         _module.GetGridRoles gridQueryRole
         
-    member __.GetGridUserRoles (gridQueryRoleUser : DtoGridQueryUser) : Either<Error, DtoGridRole> =
+    member __.GetGridUserRoles (gridQueryRoleUser : DtoGridQueryRole) : Either<Error, DtoGridUser> =
         _module.GetGridRoleUsers gridQueryRoleUser
 
     member __.GetUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoGridUser> =
