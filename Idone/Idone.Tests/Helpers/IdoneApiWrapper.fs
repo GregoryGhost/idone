@@ -73,8 +73,8 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> Seq.map __.GetGridUserRoles
         |> flattenDuplicates
 
-    member __.CreateRoles (newRoles : Role list) : Either<Error, DtoCreatedRole list> =
-        newRoles |> prepareRoleData 
-        //TODO: натыкаюсь на ту же проблему что и в __.SetRolesForUser
-        // а именно - возвращается монада, а нужно все записи собрать воедино
-        |> List.reduce (fun acc role -> acc + _module.CreateRoles <| role)
+    member __.CreateRoles (newRoles : Role list) : DtoCreatedRole list =
+        newRoles |> prepareRoleData
+        |> List.fold (fun acc role -> either {
+                return! (_module.CreateRoles role) :: acc})
+        |> reduceAllRights
