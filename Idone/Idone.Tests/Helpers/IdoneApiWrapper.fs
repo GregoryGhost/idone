@@ -47,12 +47,14 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         either {
             let findRoleId role =
                 role |> toDefaultGridQueryRole |> __.GetGridRoles >>= takeFirstRow
-            let roleIds =
+            let roleIds : int seq =
                 //TODO: проще - рефакторинг
-                ([], roles) ||> List.fold (fun (acc : Either<Error, int> list) (role : Role) -> either {
+                ([], roles) ||> List.fold (fun (acc : Either<Error, DtoRowRole> list) (role : Role) -> either {
                         let foundRole = findRoleId role
-                        return! foundRole.Id :: acc })
-                |> reduceAllRights
+                        return! foundRole :: acc })
+                |> reduceAllRights 
+                |> Seq.fold (fun acc role -> role.Id :: acc) [] 
+                |> List.toSeq
             let! foundUser = user |> toDefaultGridQueryUser |> __.GetGridUser >>= takeFirstRow
             let linkUserRoles = new DtoLinkUserRoles(foundUser.Id, roleIds)
             
@@ -76,5 +78,6 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.CreateRoles (newRoles : Role list) : DtoCreatedRole list =
         newRoles |> prepareRoleData
         |> List.fold (fun acc role -> either {
-                return! (_module.CreateRoles role) :: acc})
+                return! (_module.CreateRoles role) :: acc}) []
         |> reduceAllRights
+        |> Seq.toList
