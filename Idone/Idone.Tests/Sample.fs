@@ -53,6 +53,9 @@ module Tests =
 
           //use cases
           let registratedUser = either {
+           //TODO: нужно заменить DtoUserFilter на поиск по имени, а не мылу
+           //TODO: возвращать после регистрации пользователя его id, а не мыло,
+           //   так как id у всех сущностей должен быть одного типа.
             let! registratedUser =
                 _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
             return! registratedUser |> _security.FindRegistratedUser

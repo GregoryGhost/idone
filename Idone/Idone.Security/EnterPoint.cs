@@ -128,13 +128,13 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUser gridQueryUserRole)
+        public Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUserRole gridQueryUserRole)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRole gridQueryRoleUser)
+        public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQueryRoleUser)
         {
             throw new NotImplementedException();
         }

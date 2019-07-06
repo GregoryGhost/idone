@@ -109,13 +109,13 @@
         /// </summary>
         /// <param name="gridQueryUserRole"> Запрос на получение табличных записей ролей пользователя. </param>
         /// <returns> Возвращает монаду с табличными данными ролей пользователя. </returns>
-        Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUser gridQueryUserRole);
+        Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUserRole gridQueryUserRole);
 
         /// <summary>
         /// Получить пользователей роли.
         /// </summary>
         /// <param name="gridQueryRoleUser"> Запрос на получение табличных записей пользователей роли. </param>
         /// <returns> Возвращает монаду с табличными данными пользователей роли. </returns>
-        Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRole gridQueryRoleUser);
+        Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQueryRoleUser);
     }
 }

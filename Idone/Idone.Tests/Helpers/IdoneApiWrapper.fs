@@ -60,12 +60,13 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.GetGridRoles (gridQueryRole : DtoGridQueryRole) : Either<Error, DtoGridRole> =
         _module.GetGridRoles gridQueryRole
         
-    member __.GetGridUserRoles (gridQueryRoleUser : DtoGridQueryRole) : Either<Error, DtoGridUser> =
-        _module.GetGridRoleUsers gridQueryRoleUser
+    member __.GetGridUserRoles (gridQueryUserRole : DtoGridQueryUserRole) : Either<Error, DtoGridRole> =
+        _module.GetGridUserRoles gridQueryUserRole
 
     member __.GetUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoGridUser> =
         roles
-        |> Seq.map __.GetGridUserRoles
+        |> takeFirstRow
+        |> Seq.map (fun role -> _module.GetGrid
         |> flattenDuplicates
 
     member __.CreateRoles (newRoles : Role list) : DtoCreatedRole list =
