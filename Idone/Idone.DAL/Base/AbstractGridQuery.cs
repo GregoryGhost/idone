@@ -24,7 +24,7 @@
         /// <summary>
         /// Фильтр.
         /// </summary>
-        public virtual TFilter Filter { get; private set; }
+        public virtual Option<TFilter> Filter { get; private set; }
 
         /// <summary>
         /// Пагинация.

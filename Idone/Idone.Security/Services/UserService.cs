@@ -39,10 +39,9 @@
         public Either<Error, DtoGridUser> GetGridUser(DtoGridQueryUser gridQuery)
         {
             var dbQuery = _appContext.Users.AsQueryable();
-            var filter = gridQuery.Filter;
-
-            if (!string.IsNullOrWhiteSpace(filter.Email))
-                dbQuery = dbQuery.Where(user => user.Email == filter.Email);
+            var optionFilter = gridQuery.Filter;
+            
+            optionFilter.Bind(filter => dbQuery = dbQuery.Where(user => user.DisplayName.Contains(filter.SearchName)));
 
             var rows = dbQuery.Paginate(gridQuery.Pagination).Select(user => new DtoRowUser(user.Email, user.DisplayName, user.Id));
             var result = new DtoGridUser(rows, _appContext.Users.Count());
@@ -67,7 +66,7 @@
                 }).Bind(
                 user =>
                 {
-                    var registratedUser = new DtoRegistratedUser(user.Email);
+                    var registratedUser = new DtoRegistratedUser(user.Id);
                     return Right<Error, DtoRegistratedUser>(registratedUser);
                 });
 

@@ -10,15 +10,15 @@
         /// <summary>
         /// Контруктор по-умолчанию.
         /// </summary>
-        /// <param name="email"> Электронная почта. </param>
-        public DtoRegistratedUser(string email)
+        /// <param name="id"> Идентификатор пользователя. </param>
+        public DtoRegistratedUser(int id)
         {
-            Email = email;
+            Id = id;
         }
 
         /// <summary>
-        /// Электронная почта.
+        /// Идентификатор пользователя.
         /// </summary>
-        public string Email { get; }
+        public int Id { get; }
     }
 }
