@@ -31,11 +31,9 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         searchExpression |> __.FindUsersByDisplayName
         >>= takeFirstUser
 
-    member __.FindRegistratedUser (user : DtoRegistratedUser) : Either<Error, DtoRowUser> =
-        let convert x = toEither x Error.Exception
-        let findUser = getUsers >> Seq.tryFind (fun u -> u.Email = user.Email) >> convert
-        let gridQueryUser = new DtoUserFilter(user.Email) |> fillGridQueryUser
-        gridQueryUser |> _module.GetGridUser >>= findUser
+    member __.FindRegistratedUser (searchName : string) : Either<Error, DtoRowUser> =
+        let gridQueryUser = searchName |> fillGridQueryUser
+        gridQueryUser |> _module.GetGridUser >>= takeFirstRow
         
     member __.RegistrateUserOnDomainUser (searchExpression : string) : Either<Error, DtoRegistratedUser> =
         either {
@@ -46,15 +44,17 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.SetRolesForUser (roles : Role list, user : DtoRegistratedUser) : Either<Error, Success> =
         either {
             let roleIds = __.GetRoleIds roles
-            let! foundUser = user |> toDefaultGridQueryUser |> __.GetGridUser >>= takeFirstRow
-            let linkUserRoles = new DtoLinkUserRoles(foundUser.Id, roleIds)
+            let linkUserRoles = new DtoLinkUserRoles(user.Id, roleIds)
             
             return! _module.SetUserRoles linkUserRoles
         }     
         
     member __.FoundUsersOfRoles (roles : Role list) : DtoGridUser list =
         roles 
-        |> List.map (fun x -> x |> toDefaultGridQueryRole |> __.GetGridRoles >>= __.GetUsersOfRoles) 
+        |> List.map (fun x -> either {
+            let! gridRoles = x |> toDefaultGridQueryRole |> __.GetGridRoles
+            let! firstRow = gridRoles |> takeFirstRow
+            return! firstRow |> __.GetUsersOfRoles }) 
         |> reduceAllRights |> Seq.toList
         
     member __.GetGridRoles (gridQueryRole : DtoGridQueryRole) : Either<Error, DtoGridRole> =
@@ -63,11 +63,10 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.GetGridUserRoles (gridQueryUserRole : DtoGridQueryUserRole) : Either<Error, DtoGridRole> =
         _module.GetGridUserRoles gridQueryUserRole
 
-    member __.GetUsersOfRoles (roles : DtoGridRole) : Either<Error, DtoGridUser> =
-        roles
-        |> takeFirstRow
-        |> Seq.map (fun role -> _module.GetGrid
-        |> flattenDuplicates
+    member __.GetUsersOfRoles (rowRole : DtoRowRole) : Either<Error, DtoGridUser> =
+        rowRole 
+        |> fillGridQueryRoleUser
+        |> _module.GetGridRoleUsers
 
     member __.CreateRoles (newRoles : Role list) : DtoCreatedRole list =
         newRoles |> prepareRoleData

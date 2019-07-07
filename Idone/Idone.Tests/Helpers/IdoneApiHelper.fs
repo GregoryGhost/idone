@@ -5,6 +5,7 @@ module IdoneApiHelper =
     open Idone.DAL.Dictionaries
 
     open LanguageExt
+    open Idone.Tests.Extensions
 
 
     let FIRST_PAGE = new Pagination(10, 1)
@@ -16,6 +17,8 @@ module IdoneApiHelper =
         ]
         
     let SEARCH_DEFAULT_USER = "Кулаков*"
+
+    let SEARCH_NAME_USER = "Кулаков"
 
 
     let fillUserCredentials (userData : DtoAdUser) : DtoRegistrateUser =
@@ -29,9 +32,19 @@ module IdoneApiHelper =
     let getUsers (gridUser : DtoGridUser) : DtoRowUser seq = 
         gridUser.Rows
 
-    let fillGridQueryUser (user : DtoUserFilter) : DtoGridQueryUser =
-        let filter = new DtoUserFilter(user.Email)
+    let fillGridQueryUser (searchName : string) : DtoGridQueryUser =
+        let filter = new DtoUserFilter(searchName)
         let query = new DtoGridQueryUser(filter, FIRST_PAGE)
+        query
+
+    let fillGridQueryUserRole (registratedUser : DtoRegistratedUser) : DtoGridQueryUserRole =
+        let filter = new DtoFilterById(registratedUser.Id)
+        let query = new DtoGridQueryUserRole(filter, FIRST_PAGE)
+        query    
+        
+    let fillGridQueryRoleUser (rowRole : DtoRowRole) : DtoGridQueryRoleUser =
+        let filter = new DtoFilterById(rowRole.Id)
+        let query = new DtoGridQueryRoleUser(filter, FIRST_PAGE)
         query
         
     let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =
@@ -41,11 +54,6 @@ module IdoneApiHelper =
         
     let prepareRoleData (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
-    
-    let toDefaultGridQueryUser (user : DtoRegistratedUser) : DtoGridQueryUser =
-        let filter = new DtoUserFilter(user.Email)
-        let query = new DtoGridQueryUser(filter, FIRST_PAGE)
-        query
         
     let toRoleDtos (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
@@ -54,6 +62,8 @@ module IdoneApiHelper =
         let filter = new DtoRoleFilter(role.Name)
         let query = new DtoGridQueryRole(filter, FIRST_PAGE)
         query
+
+    let toEitherDefault x = toEither x Error.Exception
 
     let takeFirst (rows : 'a seq) : Either<Error, 'a> = 
         rows |> Seq.cast<'a> |> Seq.head |> LanguageExt.Prelude.Right<Error, 'a>

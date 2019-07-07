@@ -58,7 +58,7 @@ module Tests =
            //   так как id у всех сущностей должен быть одного типа.
             let! registratedUser =
                 _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
-            return! registratedUser |> _security.FindRegistratedUser
+            return! SEARCH_NAME_USER |> _security.FindRegistratedUser
           }
 
           Expect.isRight registratedUser "Пользователь не зарегистрирован"
@@ -80,7 +80,7 @@ module Tests =
                 let! resultSettedRoles = 
                     _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)
 
-                return! registratedUser |> toDefaultGridQueryUser |> _security.GetGridUserRoles
+                return! registratedUser |> fillGridQueryUserRole |> _security.GetGridUserRoles
             }
 
             Expect.isRight userRoles "Не найдены пользовательские роли"
