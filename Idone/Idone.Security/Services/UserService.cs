@@ -72,5 +72,45 @@
 
             return result;
         }
+
+        /// <summary>
+        /// Создать роль.
+        /// </summary>
+        /// <param name="newRole"> DTO с данными для создания роли. </param>
+        /// <returns> Возвращает монаду созданной роли. </returns>
+        public Either<Error, DtoCreatedRole> CreateRoles(DtoNewRole newRole)
+        {
+            var result = Role.Create(newRole).Bind(
+                role =>
+                {
+                    _appContext.Roles.Add(role);
+                    return _appContext.TrySaveChanges().Bind<Role>(_ => role);
+                }).Bind(
+                role =>
+                {
+                    var createdRole = new DtoCreatedRole(role.Name);
+                    return Right<Error, DtoCreatedRole>(createdRole);
+                });
+
+            return result;
+        }
+
+        /// <summary>
+        /// Получить табличные данные ролей.
+        /// </summary>
+        /// <param name="gridQuery"> Запрос на формирование табличных записей. </param>
+        /// <returns> Возвращает монаду табличных записей ролей. </returns>
+        public Either<Error, DtoGridRole> GetGridRole(DtoGridQueryRole gridQuery)
+        {
+            var dbQuery = _appContext.Roles.AsQueryable();
+            var optionFilter = gridQuery.Filter;
+
+            optionFilter.Bind(filter => dbQuery = dbQuery.Where(role => role.Name.Contains(filter.Name)));
+
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(role => new DtoRowRole(role.Name, role.Id));
+            var result = new DtoGridRole(rows, _appContext.Users.Count());
+
+            return Right<Error, DtoGridRole>(result);
+        }
     }
 }

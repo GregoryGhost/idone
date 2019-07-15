@@ -70,7 +70,9 @@
         /// <inheritdoc />
         public Either<Error, DtoCreatedRole> CreateRoles(DtoNewRole newRole)
         {
-            throw new NotImplementedException();
+            var result = _userService.CreateRoles(newRole);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -112,7 +114,9 @@
         /// <inheritdoc />
         public Either<Error, DtoGridRole> GetGridRoles(DtoGridQueryRole gridQueryRole)
         {
-            throw new NotImplementedException();
+            var result = _userService.GetGridRole(gridQueryRole);
+
+            return result;
         }
 
         /// <inheritdoc />
