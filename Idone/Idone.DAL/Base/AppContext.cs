@@ -40,17 +40,17 @@
         /// <summary>
         /// Роли.
         /// </summary>
-        public DbSet<Role> Roles { get; set; }
+        public new DbSet<Role> Roles { get; set; }
 
-        ///// <summary>
-        ///// Роли пользователей.
-        ///// </summary>
-        //public DbSet<UserRole> UserRoles { get; set; }
+        /// <summary>
+        /// Роли пользователей.
+        /// </summary>
+        public new DbSet<UserRole> UserRoles { get; set; }
 
         /// <summary>
         /// Пользователи.
         /// </summary>
-        public DbSet<User> Users { get; set; }
+        public new DbSet<User> Users { get; set; }
 
         /// <summary>
         /// Инициализировать БД.
@@ -94,11 +94,23 @@
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserConfig());
+            modelBuilder.ApplyConfiguration(new UserRoleConfig());
+
             base.OnModelCreating(modelBuilder);
         }
     }
 
-    public class UserConfig: IEntityTypeConfiguration<User>
+    public class UserRoleConfig : IEntityTypeConfiguration<UserRole>
+    {
+        public void Configure(EntityTypeBuilder<UserRole> builder)
+        {
+            builder.HasOne(ur => ur.User).WithMany(user => user.UserRoles).OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(ur => ur.Role).WithMany(role => role.UserRoles).OnDelete(DeleteBehavior.Cascade);
+            builder.HasIndex("RoleId", "UserId").IsUnique();
+        }
+    }
+
+    public class UserConfig : IEntityTypeConfiguration<User>
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {

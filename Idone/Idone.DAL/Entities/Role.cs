@@ -1,5 +1,7 @@
 ﻿namespace Idone.DAL.Entities
 {
+    using System.Collections.Generic;
+
     using Idone.DAL.Dictionaries;
     using Idone.DAL.DTO;
 
@@ -20,6 +22,12 @@
         private Role()
         {
         }
+
+        /// <summary>
+        /// Пользователи роли.
+        /// </summary>
+        public IEnumerable<UserRole> UserRoles { get; private set; }
+
 
         /// <summary>
         /// Создать роль.

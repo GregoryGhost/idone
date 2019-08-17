@@ -109,7 +109,8 @@
         /// </summary>
         /// <param name="gridQueryUserRole"> Запрос на получение табличных записей ролей пользователя. </param>
         /// <returns> Возвращает монаду с табличными данными ролей пользователя. </returns>
-        Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUserRole gridQueryUserRole);
+        Either<Error, DtoGridRole> GetGridUserRoles
+            (DtoGridQueryUserRole gridQueryUserRole);
 
         /// <summary>
         /// Получить пользователей роли.

@@ -44,7 +44,15 @@ module Tests =
         dbContext.Users.Clear()
         dbContext.SaveChanges()
 
-      testList "Модуль админки" [       
+      let clearUserRoles() =
+        let dbContext = _servicesProvider.GetService<AppContext>()
+        dbContext.UserRoles.Clear()
+        dbContext.Users.Clear()
+        dbContext.Roles.Clear()
+        dbContext.SaveChanges()
+
+      testSequencedGroup "Последовательное выполнение тестов по работе с БД" 
+        <| testList "Модуль админки" [       
         test "Регистрация нового пользователя" {
             //1.Найти пользователя в домене (берем хардкод данные)
             //2.Получить данные требуемого пользователя у AD сервера
@@ -53,9 +61,6 @@ module Tests =
 
           //use cases
           let registratedUser = either {
-           //TODO: нужно заменить DtoUserFilter на поиск по имени, а не мылу
-           //TODO: возвращать после регистрации пользователя его id, а не мыло,
-           //   так как id у всех сущностей должен быть одного типа.
             let! registratedUser =
                 _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
             return! SEARCH_NAME_USER |> _security.FindRegistratedUser
@@ -84,7 +89,7 @@ module Tests =
             }
 
             Expect.isRight userRoles "Не найдены пользовательские роли"
-            //TODO: очищать роли, пользователей, назначенные роли пользователю.
+            clearUserRoles() |> ignore
         }
 
         test "Назначение прав для роли" {

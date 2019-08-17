@@ -102,7 +102,9 @@
         /// <inheritdoc />
         public Either<Error, Success> SetUserRoles(DtoLinkUserRoles linkUserRoles)
         {
-            throw new NotImplementedException();
+            var result = _userService.SetUserRoles(linkUserRoles);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -134,7 +136,9 @@
         /// <inheritdoc />
         public Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUserRole gridQueryUserRole)
         {
-            throw new NotImplementedException();
+            var result = _userService.GetGridUserRoles(gridQueryUserRole);
+
+            return result;
         }
 
         /// <inheritdoc />

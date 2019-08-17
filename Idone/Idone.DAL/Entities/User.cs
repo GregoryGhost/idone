@@ -1,5 +1,6 @@
 ﻿namespace Idone.DAL.Entities
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using Idone.DAL.Dictionaries;
@@ -32,6 +33,11 @@
         /// Полное имя пользователя.
         /// </summary>
         public FullName FullName { get; private set; }
+
+        /// <summary>
+        /// Роли пользователя.
+        /// </summary>
+        public IEnumerable<UserRole> UserRoles { get; private set; }
 
         /// <summary>
         /// Создать пользователя.

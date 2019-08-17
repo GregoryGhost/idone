@@ -10,7 +10,11 @@
 
     using LanguageExt;
 
+    using Microsoft.EntityFrameworkCore.ChangeTracking;
+
     using static LanguageExt.Prelude;
+
+    using Success = Idone.DAL.Dictionaries.Success;
 
     /// <summary>
     /// Сервис по работе с пользователями.
@@ -108,6 +112,40 @@
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(role => role.Name.Contains(filter.Name)));
 
             var rows = dbQuery.Paginate(gridQuery.Pagination).Select(role => new DtoRowRole(role.Name, role.Id));
+            var result = new DtoGridRole(rows, _appContext.Users.Count());
+
+            return Right<Error, DtoGridRole>(result);
+        }
+
+        public Either<Error, Success> SetUserRoles(DtoLinkUserRoles linkUserRoles)
+        {
+            var roles = linkUserRoles.RoleIds.Select(role => _appContext.Roles.Find<Role>(role));
+            var result = _appContext.Users.Find<User>(linkUserRoles.UserId).Bind(
+                user =>
+                {
+                    roles.Select(
+                        role => 
+                        {
+                            UserRole.Create(user, role).Bind<EntityEntry<UserRole>>(link =>
+                                _appContext.UserRoles.Add(link));
+                            return Right<Error, Role>(role);
+                        });
+                    var t = _appContext.TrySaveChanges().Bind<Success>(_ => Success.ItsSuccess);
+                    return t.ToOption();//TODO: костыль, конечно))
+                });
+
+            return result.ToEither(Error.Exception);//TODO: костыль, конечно))
+        }
+
+        public Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUserRole gridQuery)
+        {
+            var dbQuery = _appContext.UserRoles.AsQueryable();
+            var optionFilter = gridQuery.Filter;
+
+            optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.User.Id == filter.Id));
+
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole =>
+                _appContext.Roles.Find(userRole.Role.Id)).Where(role => role != null).Select(role => new DtoRowRole(role.Name, role.Id));
             var result = new DtoGridRole(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridRole>(result);
