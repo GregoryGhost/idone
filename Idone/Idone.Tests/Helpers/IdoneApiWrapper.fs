@@ -7,6 +7,7 @@ open LanguageExt
 open Idone.DAL.DTO
 open Idone.DAL.Dictionaries
 
+open Idone.Tests.Types
 open Idone.Tests.Extensions
 open Idone.Tests.Helpers.IdoneApiHelper
 
@@ -71,7 +72,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.CreateRoles (newRoles : Role list) : DtoCreatedRole list =
         newRoles |> prepareRoleData
         |> List.fold (fun acc role -> either {
-                return! (_module.CreateRoles role) :: acc}) []
+                return! (_module.CreateRole role) :: acc}) []
         |> reduceAllRights
         |> Seq.toList
 

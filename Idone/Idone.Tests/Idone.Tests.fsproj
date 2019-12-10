@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Include="Types.fs" />
+    <Compile Include="Constants.fs" />
     <Compile Include="Extensions\LanguageExtExtension.fs" />
     <Compile Include="Extensions\ExpectoExtension.fs" />
     <Compile Include="Helpers\IdoneApiHelper.fs" />

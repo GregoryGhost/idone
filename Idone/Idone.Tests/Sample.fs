@@ -10,6 +10,7 @@ module Tests =
     open Idone.DAL.Dictionaries
     open Idone.DAL.Base
     open Idone.DAL.Base.Extensions
+    open Idone.Tests.Constants
     open Idone.Tests.Extensions
     open Idone.Tests.Helpers
     open Idone.Tests.Helpers.IdoneApiHelper
@@ -42,6 +43,13 @@ module Tests =
       let clearUsers() =
         let dbContext = _servicesProvider.GetService<AppContext>()
         dbContext.Users.Clear()
+        dbContext.SaveChanges()
+
+      let clearRolesPerms() =
+        let dbContext = _servicesProvider.GetService<AppContext>()
+        dbContext.RolePermissions.Clear()
+        dbContext.Roles.Clear()
+        dbContext.Permissions.Clear()
         dbContext.SaveChanges()
 
       let clearUserRoles() =
@@ -94,10 +102,32 @@ module Tests =
 
         test "Назначение прав для роли" {
             //1. Создать роли
-            //2. Назначить права для роли
-            //3. Получить права роли
-            //4. Получить роль из всех назначенных прав
-            Expect.equal 1 1
+            //2. Назначить права для ролей
+            //3. Получить права ролей
+            //4. Получить роли из всех назначенных прав
+            let startRoles = PERMS_ROLES_LINKS |> getRoles
+            let startPerms = PERMS_ROLES_LINKS |> getPerms
+            let foundRoles : Either<Error, DtoGridRole> = either {
+                let! createdRoles = 
+                    startRoles |> _security.CreateRoles
+                Expect.isRight createdRoles "Не удалось создать роли"
+
+                let! result =
+                    _security.SetPermissionsForRole(PERMS_ROLES_LINKS)
+                Expect.isRight result "Не удалось назначить права для ролей"
+                
+                let! perms =
+                    _security.GetRolesPermissions(startRoles)
+                Expect.isRight perms "Не удалось получить назначенные права для ролей"
+
+                let! roles =
+                    _security.GetPermissionsRoles(startPerms)
+                
+                return! roles
+            }
+            
+            Expect.isRight foundRoles "Не найдены роли, назначенных прав"
+            clearRolesPerms() |> ignore
         }
 
         test "Назначены права для пользователя(через роли)" {

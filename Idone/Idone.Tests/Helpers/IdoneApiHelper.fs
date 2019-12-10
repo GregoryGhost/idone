@@ -3,23 +3,11 @@
 module IdoneApiHelper =
     open Idone.DAL.DTO
     open Idone.DAL.Dictionaries
+    open Idone.Tests.Constants
+    open Idone.Tests.Extensions
+    open Idone.Tests.Types
 
     open LanguageExt
-    open Idone.Tests.Extensions
-
-
-    let FIRST_PAGE = new Pagination(10, 1)
-    
-    let ADMIN_AND_USER_ROLES =
-        [
-            { Name = "админ" }
-            { Name = "пользователь" }
-        ]
-        
-    let SEARCH_DEFAULT_USER = "Кулаков*"
-
-    let SEARCH_NAME_USER = "Кулаков"
-
 
     let fillUserCredentials (userData : DtoAdUser) : DtoRegistrateUser =
         new DtoRegistrateUser(
@@ -31,6 +19,12 @@ module IdoneApiHelper =
 
     let getUsers (gridUser : DtoGridUser) : DtoRowUser seq = 
         gridUser.Rows
+
+    let getRoles (links : PermRoleLink list) : Role list = 
+        List.fold (fun acc link -> link.Role :: acc) [] links
+
+    let getPerms (links : PermRoleLink list) : Perm list = 
+        List.fold (fun acc link -> link.Perm :: acc) [] links
 
     let fillGridQueryUser (searchName : string) : DtoGridQueryUser =
         let filter = new DtoUserFilter(searchName)

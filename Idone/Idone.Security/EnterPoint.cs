@@ -35,6 +35,32 @@
         }
 
         /// <inheritdoc />
+        public Either<Error, Success> AllowRolePermissions(DtoLinkRolePermissions linkRolePermissions)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoCreatedPermission> CreatePermissions(DtoNewPermission newPermission)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoCreatedRole> CreateRole(DtoNewRole newRole)
+        {
+            var result = _userService.CreateRoles(newRole);
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions linkRolePermissions)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
         public Either<Error, IEnumerable<DtoAdUser>> FindUsersByDisplayName(string searchExpression)
         {
             //TODO: выделить в метод сервиса AdService
@@ -60,55 +86,19 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridUser> GetGridUser(DtoGridQueryUser gridQueryUser)
-        {
-            var result = _userService.GetGridUser(gridQueryUser);
-
-            return result;
-        }
-
-        /// <inheritdoc />
-        public Either<Error, DtoCreatedRole> CreateRoles(DtoNewRole newRole)
-        {
-            var result = _userService.CreateRoles(newRole);
-
-            return result;
-        }
-
-        /// <inheritdoc />
-        public Either<Error, Success> AllowRolePermissions(DtoLinkRolePermissions linkRolePermissions)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions linkRolePermissions)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public Either<Error, DtoGridRole> GetGridRolePermissions(DtoGridQueryRole gridQueryRole)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
         public Either<Error, DtoGridPermission> GetGridPermissionRoles(DtoGridQueryPermission gridQueryPermission)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public Either<Error, Success> SetUserRoles(DtoLinkUserRoles linkUserRoles)
+        public Either<Error, DtoGridPermission> GetGridPermissions(DtoGridQueryPermission gridQuerypermission)
         {
-            var result = _userService.SetUserRoles(linkUserRoles);
-
-            return result;
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles linkUserRoles)
+        public Either<Error, DtoGridRole> GetGridRolePermissions(DtoGridQueryRole gridQueryRole)
         {
             throw new NotImplementedException();
         }
@@ -122,9 +112,17 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridPermission> GetGridPermissions(DtoGridQueryPermission gridQuerypermission)
+        public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQueryRoleUser)
         {
             throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoGridUser> GetGridUser(DtoGridQueryUser gridQueryUser)
+        {
+            var result = _userService.GetGridUser(gridQueryUser);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -142,17 +140,25 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQueryRoleUser)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
         public Either<Error, DtoRegistratedUser> RegistrateUser(DtoRegistrateUser registrateUser)
         {
             var result = _userService.RegistrateUser(registrateUser);
 
             return result;
+        }
+
+        /// <inheritdoc />
+        public Either<Error, Success> SetUserRoles(DtoLinkUserRoles linkUserRoles)
+        {
+            var result = _userService.SetUserRoles(linkUserRoles);
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles linkUserRoles)
+        {
+            throw new NotImplementedException();
         }
     }
 }

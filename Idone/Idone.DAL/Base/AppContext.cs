@@ -27,15 +27,15 @@
         {
         }
 
-        ///// <summary>
-        ///// Права доступа.
-        ///// </summary>
-        //public DbSet<Permission> Persmissions { get; set; }
+        /// <summary>
+        /// Права доступа.
+        /// </summary>
+        public DbSet<Permission> Permissions { get; set; }
 
-        ///// <summary>
-        ///// Права доступа для ролей.
-        ///// </summary>
-        //public DbSet<RolePermission> RolePermissions { get; set; }
+        /// <summary>
+        /// Права доступа для ролей.
+        /// </summary>
+        public DbSet<RolePermission> RolePermissions { get; set; }
 
         /// <summary>
         /// Роли.
