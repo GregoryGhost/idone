@@ -105,12 +105,17 @@ module Tests =
             //2. Назначить права для ролей
             //3. Получить права ролей
             //4. Получить роли из всех назначенных прав
+
             let startRoles = PERMS_ROLES_LINKS |> getRoles
             let startPerms = PERMS_ROLES_LINKS |> getPerms
             let foundRoles : Either<Error, DtoGridRole> = either {
-                let! createdRoles = 
+                let createdRoles = 
                     startRoles |> _security.CreateRoles
-                Expect.isRight createdRoles "Не удалось создать роли"
+                Expect.isNonEmpty createdRoles "Не удалось создать роли"
+
+                let! createdPerms =
+                    startPerms |> _security.CreatePermissions
+                Expect.isRight createdPerms "Не удалось создать права"
 
                 let! result =
                     _security.SetPermissionsForRole(PERMS_ROLES_LINKS)

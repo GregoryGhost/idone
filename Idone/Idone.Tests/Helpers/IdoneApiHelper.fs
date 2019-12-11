@@ -21,10 +21,10 @@ module IdoneApiHelper =
         gridUser.Rows
 
     let getRoles (links : PermRoleLink list) : Role list = 
-        List.fold (fun acc link -> link.Role :: acc) [] links
+        List.map (fun link -> link.Role) links
 
     let getPerms (links : PermRoleLink list) : Perm list = 
-        List.fold (fun acc link -> link.Perm :: acc) [] links
+        List.map (fun link -> link.Perm) links
 
     let fillGridQueryUser (searchName : string) : DtoGridQueryUser =
         let filter = new DtoUserFilter(searchName)

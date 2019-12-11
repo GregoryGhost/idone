@@ -88,3 +88,5 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> reduceAllRights 
         |> Seq.fold (fun acc role -> role.Id :: acc) [] 
         |> List.toSeq
+
+    member __.SetPermissionsForRole()
