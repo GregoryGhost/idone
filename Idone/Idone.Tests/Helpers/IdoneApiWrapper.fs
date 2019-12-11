@@ -71,22 +71,29 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
 
     member __.CreateRoles (newRoles : Role list) : DtoCreatedRole list =
         newRoles |> prepareRoleData
-        |> List.fold (fun acc role -> either {
-                return! (_module.CreateRole role) :: acc}) []
-        |> reduceAllRights
-        |> Seq.toList
+        |> List.map (fun role -> either {
+                return! (_module.CreateRole role) })
+        |> reduceAllRights |> Seq.toList
 
     member __.FindRole (role : Role) : Either<Error, DtoRowRole> =
         role |> toDefaultGridQueryRole |> __.GetGridRoles >>= takeFirstRow
 
     member __.GetRoleIds (roles : Role list) : int seq =
-        ([], roles) ||> List.fold (fun acc role -> 
-            either {
-                let foundRole = __.FindRole role
-                return! foundRole :: acc
-            })
+        roles |> List.map (fun role -> either {
+                return! __.FindRole role })
         |> reduceAllRights 
-        |> Seq.fold (fun acc role -> role.Id :: acc) [] 
-        |> List.toSeq
+        |> Seq.map (fun role -> role.Id)
 
-    member __.SetPermissionsForRole()
+    member __.CreatePermissions (newPerms : Perm list) : DtoCreatedPermission list =
+        newPerms |> preparePermData
+        |> List.map (fun perm -> either {
+                return! (_module.CreatePermissions perm) })
+        |> reduceAllRights
+        |> Seq.toList
+
+    member __.SetPermissionsForRole (links: PermRoleLink list) : Success list =
+        links |> preparePermRoleLinkData
+        |> List.map (fun link -> either {
+                return! (_module.AllowRolePermissions link) })
+        |> reduceAllRights
+        |> Seq.toList

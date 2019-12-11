@@ -8,6 +8,7 @@ module IdoneApiHelper =
     open Idone.Tests.Types
 
     open LanguageExt
+    open Idone.Security
 
     let fillUserCredentials (userData : DtoAdUser) : DtoRegistrateUser =
         new DtoRegistrateUser(
@@ -48,7 +49,13 @@ module IdoneApiHelper =
         
     let prepareRoleData (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
+
+    let preparePermData (perms : Perm list) : DtoNewPermission list =
+        perms |> List.map (fun perm -> new DtoNewPermission(perm.Name))
         
+    let preparePermRoleLinkData (links : PermRoleLink list) : DtoLinkRolePermissions list =
+        links |> List.map (fun link -> new DtoLinkRolePermissions(link.Role.))
+
     let toRoleDtos (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
         

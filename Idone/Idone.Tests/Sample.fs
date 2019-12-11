@@ -108,30 +108,38 @@ module Tests =
 
             let startRoles = PERMS_ROLES_LINKS |> getRoles
             let startPerms = PERMS_ROLES_LINKS |> getPerms
-            let foundRoles : Either<Error, DtoGridRole> = either {
-                let createdRoles = 
+            let linksLength = List.length PERMS_ROLES_LINKS
+
+            let createdRoles = 
                     startRoles |> _security.CreateRoles
-                Expect.isNonEmpty createdRoles "Не удалось создать роли"
+            Expect.hasLength <||| (createdRoles,
+                                    linksLength,
+                                    "Не удалось создать роли")
 
-                let! createdPerms =
-                    startPerms |> _security.CreatePermissions
-                Expect.isRight createdPerms "Не удалось создать права"
-
-                let! result =
-                    _security.SetPermissionsForRole(PERMS_ROLES_LINKS)
-                Expect.isRight result "Не удалось назначить права для ролей"
+            let createdPerms =
+                startPerms |> _security.CreatePermissions
+            Expect.hasLength <||| (createdPerms,
+                                    linksLength, 
+                                    "Не удалось создать права")
                 
-                let! perms =
-                    _security.GetRolesPermissions(startRoles)
-                Expect.isRight perms "Не удалось получить назначенные права для ролей"
-
-                let! roles =
-                    _security.GetPermissionsRoles(startPerms)
+            let result =
+                _security.SetPermissionsForRole(PERMS_ROLES_LINKS)
+            Expect.hasLength <||| (result,
+                            linksLength,
+                            "Не удалось назначить права для ролей")
                 
-                return! roles
-            }
+            let perms =
+                _security.GetRolesPermissions(startRoles)
+            Expect.hasLength <||| (perms,
+                linksLength,
+                "Не удалось получить назначенные права для ролей")
+
+            let roles =
+                _security.GetPermissionsRoles(startPerms)
+            Expect.hasLength <||| (roles,
+                linksLength,
+                "Не найдены роли, назначенных прав")
             
-            Expect.isRight foundRoles "Не найдены роли, назначенных прав"
             clearRolesPerms() |> ignore
         }
 
