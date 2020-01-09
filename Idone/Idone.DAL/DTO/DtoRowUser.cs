@@ -12,7 +12,7 @@
         /// </summary>
         /// <param name="email"> Почта. </param>
         /// <param name="displayName"> Отображаемое имя пользователя. </param>
-        /// <param name "id"> Идентификатор пользователя. </param>
+        /// <param name="id"> Идентификатор пользователя. </param>
         public DtoRowUser(string email, string displayName, int id)
         {
             Email = email;

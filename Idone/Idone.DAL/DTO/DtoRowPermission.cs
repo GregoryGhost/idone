@@ -11,14 +11,21 @@ namespace Idone.DAL.DTO
         /// Конструктор по умолчанию.
         /// </summary>
         /// <param name="name"> Наименование права. </param>
-        public DtoRowPermission(string name)
+        /// <param name="id">Идентификатор права.</param>
+        public DtoRowPermission(string name, int id)
         {
             Name = name;
+            Id = id;
         }
+
+        /// <summary>
+        /// Идентификатор права.
+        /// </summary>
+        public int Id { get; }
 
         /// <summary>
         /// Наименование права.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
     }
 }

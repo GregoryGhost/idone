@@ -53,8 +53,13 @@ module IdoneApiHelper =
     let preparePermData (perms : Perm list) : DtoNewPermission list =
         perms |> List.map (fun perm -> new DtoNewPermission(perm.Name))
         
-    let preparePermRoleLinkData (links : PermRoleLink list) : DtoLinkRolePermissions list =
-        links |> List.map (fun link -> new DtoLinkRolePermissions(link.Role.))
+    let inline bindData
+                 (entity1 : #IIdentity list)
+                 (entity2 : #IIdentity list)
+                 : DtoLinkRolePermissions list =
+         (entity1, entity2) 
+         ||> List.map2 (fun e1 e2 ->
+             new DtoLinkRolePermissions(e1.Id, [e2.Id] |> List.toSeq))
 
     let toRoleDtos (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))

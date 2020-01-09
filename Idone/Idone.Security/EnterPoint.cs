@@ -41,13 +41,13 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoCreatedPermission> CreatePermissions(DtoNewPermission newPermission)
+        public Either<Error, DtoPermission> CreatePermissions(DtoNewPermission newPermission)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoCreatedRole> CreateRole(DtoNewRole newRole)
+        public Either<Error, DAL.DTO.DtoRole> CreateRole(DtoNewRole newRole)
         {
             var result = _userService.CreateRoles(newRole);
 
@@ -113,6 +113,18 @@
 
         /// <inheritdoc />
         public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQueryRoleUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoRole> GetRoleById(int roleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Either<Error, DtoPermission> GetPermissionById(int permId)
         {
             throw new NotImplementedException();
         }

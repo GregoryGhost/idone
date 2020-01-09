@@ -82,7 +82,7 @@
         /// </summary>
         /// <param name="newRole"> DTO с данными для создания роли. </param>
         /// <returns> Возвращает монаду созданной роли. </returns>
-        public Either<Error, DtoCreatedRole> CreateRoles(DtoNewRole newRole)
+        public Either<Error, DtoRole> CreateRoles(DtoNewRole newRole)
         {
             var result = Role.Create(newRole).Bind(
                 role =>
@@ -92,8 +92,8 @@
                 }).Bind(
                 role =>
                 {
-                    var createdRole = new DtoCreatedRole(role.Name);
-                    return Right<Error, DtoCreatedRole>(createdRole);
+                    var createdRole = new DtoRole(role.Name);
+                    return Right<Error, DtoRole>(createdRole);
                 });
 
             return result;

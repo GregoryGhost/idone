@@ -69,7 +69,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> fillGridQueryRoleUser
         |> _module.GetGridRoleUsers
 
-    member __.CreateRoles (newRoles : Role list) : DtoCreatedRole list =
+    member __.CreateRoles (newRoles : Role list) : DtoRole list =
         newRoles |> prepareRoleData
         |> List.map (fun role -> either {
                 return! (_module.CreateRole role) })
@@ -84,16 +84,24 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> reduceAllRights 
         |> Seq.map (fun role -> role.Id)
 
-    member __.CreatePermissions (newPerms : Perm list) : DtoCreatedPermission list =
+    member __.CreatePermissions (newPerms : Perm list) : DtoPermission list =
         newPerms |> preparePermData
         |> List.map (fun perm -> either {
                 return! (_module.CreatePermissions perm) })
         |> reduceAllRights
         |> Seq.toList
 
-    member __.SetPermissionsForRole (links: PermRoleLink list) : Success list =
-        links |> preparePermRoleLinkData
+    member __.SetPermissionsForRole (links: DtoLinkRolePermissions list) : Success list =
+        links
         |> List.map (fun link -> either {
                 return! (_module.AllowRolePermissions link) })
         |> reduceAllRights
         |> Seq.toList
+
+    member __.GetRolesPermissions (roles: #IIdentity list) : DtoRowPermission list =
+        roles
+        |> List.map (fun role -> either {
+                return! (_module.GetGridRolePermissions roleId)})
+
+    member __.GetPermissionsRoles (perms: #IIdentity list) : DtoRowRole list =
+        raise (System.NotImplementedException())

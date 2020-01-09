@@ -39,14 +39,14 @@
         /// </summary>
         /// <param name="newRole"> Новая роль. </param>
         /// <returns> Возвращает монаду с данными созданной роли. </returns>
-        Either<Error, DtoCreatedRole> CreateRole(DtoNewRole newRole);
+        Either<Error, DtoRole> CreateRole(DtoNewRole newRole);
 
         /// <summary>
         /// Создать право.
         /// </summary>
         /// <param name="newPermission"> Новое право. </param>
         /// <returns> Возвращает монаду с данными созданного права. </returns>
-        Either<Error, DtoCreatedPermission> CreatePermissions(DtoNewPermission newPermission);
+        Either<Error, DtoPermission> CreatePermissions(DtoNewPermission newPermission);
 
         /// <summary>
         /// Назначить права для роли.
@@ -125,25 +125,9 @@
         /// <param name="gridQueryRoleUser"> Запрос на получение табличных записей пользователей роли. </param>
         /// <returns> Возвращает монаду с табличными данными пользователей роли. </returns>
         Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQueryRoleUser);
-    }
 
-    public class DtoNewPermission: Record<DtoNewPermission>
-    {
-        public DtoNewPermission(string name)
-        {
-            Name = name;
-        }
+        Either<Error, DtoRole> GetRoleById(int roleId);
 
-        public string Name { get; }
-    }
-
-    public class DtoCreatedPermission: Record<DtoCreatedPermission>
-    {
-        public DtoCreatedPermission(string name)
-        {
-            Name = name;
-        }
-
-        public string Name { get; }
+        Either<Error, DtoPermission> GetPermissionById(int permId);
     }
 }

@@ -121,9 +121,10 @@ module Tests =
             Expect.hasLength <||| (createdPerms,
                                     linksLength, 
                                     "Не удалось создать права")
-                
-            let result =
-                _security.SetPermissionsForRole(PERMS_ROLES_LINKS)
+            let rolePermLinks =
+                bindData createdRoles createdPerms
+            let result = 
+                _security.SetPermissionsForRole(rolePermLinks)
             Expect.hasLength <||| (result,
                             linksLength,
                             "Не удалось назначить права для ролей")
