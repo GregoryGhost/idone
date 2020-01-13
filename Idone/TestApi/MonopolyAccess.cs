@@ -14,17 +14,21 @@
     {
         private readonly List<int> _list = new List<int>();
 
-        private readonly AsyncAutoResetEvent _trigger = new AsyncAutoResetEvent(false);
+        private readonly AsyncManualResetEvent _trigger = new AsyncManualResetEvent(false);
 
-        public async Task<Either<MonopolyAccessFail, MonopolyAccessStates>> AddRecordAsync(int newNumber)
+        public async Task<Either<MonopolyAccessErrors, MonopolyAccessStates>> AddRecordAsync(int newNumber)
         {
             if (_trigger.IsSet)
-                return Right<MonopolyAccessFail, MonopolyAccessStates>(MonopolyAccessStates.IsBlocked);
+                return Right<MonopolyAccessErrors, MonopolyAccessStates>(MonopolyAccessStates.IsBlocked);
 
             _trigger.Set();
 
-            return Right<MonopolyAccessFail, MonopolyAccessStates> (MonopolyAccessStates.WasBlocked);
+            _list.Add(newNumber);
+
+            return Right<MonopolyAccessErrors, MonopolyAccessStates> (MonopolyAccessStates.WasBlocked);
         }
+
+        public void ResetBlock() => _trigger.Reset();
     }
 
     public enum MonopolyAccessStates
@@ -33,7 +37,7 @@
         WasBlocked,
     }
 
-    public enum MonopolyAccessFail
+    public enum MonopolyAccessErrors
     {
         Poisoned
     }
