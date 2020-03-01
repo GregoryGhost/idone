@@ -98,9 +98,11 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridRole> GetGridRolePermissions(DtoGridQueryRole gridQueryRole)
+        public Either<Error, DtoGridPermission> GetGridRolePermissions(DtoGridQueryRolePermission gridQueryRole)
         {
-            throw new NotImplementedException();
+            var result = _userService.GetRolePermissions(gridQueryRole);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -122,7 +124,9 @@
         /// <inheritdoc />
         public Either<Error, DtoRole> GetRoleById(int roleId)
         {
-            throw new NotImplementedException();
+            var result = _userService.GetRoleById(roleId);
+
+            return result;
         }
 
         /// <inheritdoc />

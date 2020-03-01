@@ -155,7 +155,8 @@
         {
             var dbQuery = _appContext.UserRoles.AsQueryable();
             var optionFilter = gridQuery.Filter;
-
+            
+            //TODO: не те записи вытягиваю
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.User.Id == filter.Id));
 
             var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole =>
@@ -163,6 +164,25 @@
             var result = new DtoGridUser(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridUser>(result);
+        }
+
+        public Either<Error, DtoRole> GetRoleById(int roleId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Either<Error, DtoGridPermission> GetRolePermissions(DtoGridQueryRolePermission gridQuery)
+        {
+            var dbQuery = _appContext.RolePermissions.AsQueryable();
+            var optionFilter = gridQuery.Filter;
+
+            optionFilter.Bind(filter => dbQuery = dbQuery.Where(rolePermission => rolePermission.Role.Id == filter.Id));
+
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(rolePermission =>
+                _appContext.Permissions.Find(rolePermission.Permission.Id)).Where(permission => permission != null).Select(permission => new DtoRowPermission(permission.Name, permission.Id));
+            var result = new DtoGridPermission(rows, _appContext.Permissions.Count());
+
+            return Right<Error, DtoGridPermission>(result);
         }
     }
 }
