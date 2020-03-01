@@ -114,7 +114,9 @@
         /// <inheritdoc />
         public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQueryRoleUser)
         {
-            throw new NotImplementedException();
+            var result = _userService.GetGridRoleUsers(gridQueryRoleUser);
+
+            return result;
         }
 
         /// <inheritdoc />

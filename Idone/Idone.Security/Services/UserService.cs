@@ -150,5 +150,19 @@
 
             return Right<Error, DtoGridRole>(result);
         }
+
+        public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQuery)
+        {
+            var dbQuery = _appContext.UserRoles.AsQueryable();
+            var optionFilter = gridQuery.Filter;
+
+            optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.User.Id == filter.Id));
+
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole =>
+                _appContext.Users.Find(userRole.User.Id)).Where(user => user != null).Select(user => new DtoRowUser(user.Email, user.DisplayName, user.Id));
+            var result = new DtoGridUser(rows, _appContext.Users.Count());
+
+            return Right<Error, DtoGridUser>(result);
+        }
     }
 }
