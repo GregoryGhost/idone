@@ -156,8 +156,7 @@
             var dbQuery = _appContext.UserRoles.AsQueryable();
             var optionFilter = gridQuery.Filter;
             
-            //TODO: не те записи вытягиваю
-            optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.User.Id == filter.Id));
+            optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.Role.Id == filter.Id));
 
             var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole =>
                 _appContext.Users.Find(userRole.User.Id)).Where(user => user != null).Select(user => new DtoRowUser(user.Email, user.DisplayName, user.Id));
