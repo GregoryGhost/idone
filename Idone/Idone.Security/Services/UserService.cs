@@ -1,19 +1,22 @@
 ﻿namespace Idone.Security.Services
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
 
-    using Idone.DAL.Base;
     using Idone.DAL.Base.Extensions;
     using Idone.DAL.Dictionaries;
     using Idone.DAL.DTO;
     using Idone.DAL.Entities;
 
     using LanguageExt;
+    using LanguageExt.UnsafeValueAccess;
 
     using Microsoft.EntityFrameworkCore.ChangeTracking;
 
     using static LanguageExt.Prelude;
 
+    using AppContext = Idone.DAL.Base.AppContext;
     using Success = Idone.DAL.Dictionaries.Success;
 
     /// <summary>
@@ -170,7 +173,7 @@
             throw new System.NotImplementedException();
         }
 
-        public Either<Error, DtoGridPermission> GetRolePermissions(DtoGridQueryRolePermission gridQuery)
+        public Either<Error, DtoGridPermission> GetGridRolePermissions(DtoGridQueryRolePermission gridQuery)
         {
             var dbQuery = _appContext.RolePermissions.AsQueryable();
             var optionFilter = gridQuery.Filter;
@@ -182,6 +185,35 @@
             var result = new DtoGridPermission(rows, _appContext.Permissions.Count());
 
             return Right<Error, DtoGridPermission>(result);
+        }
+
+        public Either<Error, DtoGridPermission> GetGridUserPermissions(DtoGridQueryUserPermission gridQuery)
+        {
+            var result = gridQuery.Filter.ToEither(() => Error.Exception).Bind(filter => GetGridUserRoles(new DtoGridQueryUserRole(filter, gridQuery.Pagination))).Bind(
+                    gridRoles =>
+                    {
+                        var (errors, permissions) = gridRoles.Rows.Select(
+                            role =>
+                            {
+                                var filter = new DtoFilterById(role.Id);
+                                var query = new DtoGridQueryRolePermission(
+                                    filter,
+                                    gridQuery.Pagination);
+                                var perms = GetGridRolePermissions(query);
+
+                                return perms;
+                            }).Partition();
+
+                        if (errors.Any())
+                            return Left<Error, DtoGridPermission>(errors.First());//TODO: нужна конвертацию списка ошибок в одну аггрегирующую ошибку, убрать errors.First!
+                        
+                        var pagedPermissions = permissions.SelectMany(x => x.Rows).AsQueryable().Paginate(gridQuery.Pagination);//TODO: костыль, потому что будет все записи вытягивать из БД, а потом применять пагинацию
+                        var grid = new DtoGridPermission(pagedPermissions, permissions.Count());
+
+                        return Right<Error, DtoGridPermission>(grid);
+                    });
+
+            return result;
         }
     }
 }

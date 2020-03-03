@@ -109,7 +109,7 @@
         /// </summary>
         /// <param name="gridQueryUserPermission"> Запрос на получение табличных записей прав пользователя. </param>
         /// <returns> Возвращает монадау с табличными данными прав пользователя. </returns>
-        Either<Error, DtoGridPermission> GetGridUserPermissions(DtoGridQueryUser gridQueryUserPermission);
+        Either<Error, DtoGridPermission> GetGridUserPermissions(DtoGridQueryUserPermission gridQueryUserPermission);
 
         /// <summary>
         /// Получить роли пользователя.
