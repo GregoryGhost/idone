@@ -215,5 +215,19 @@
 
             return result;
         }
+
+        public Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermission gridQuery)
+        {
+            var dbQuery = _appContext.RolePermissions.AsQueryable();
+            var optionFilter = gridQuery.Filter;
+
+            optionFilter.Bind(filter => dbQuery = dbQuery.Where(permissionRole => permissionRole.Permission.Id == filter.Id));
+
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(permissionRole =>
+                _appContext.Roles.Find(permissionRole.Role.Id)).Where(role => role != null).Select(role => new DtoRowRole(role.Name, role.Id));
+            var result = new DtoGridRole(rows, _appContext.Roles.Count());
+
+            return Right<Error, DtoGridRole>(result);
+        }
     }
 }

@@ -74,7 +74,7 @@
         /// </summary>
         /// <param name="gridQueryPermission"> Запрос на получение табличных записей ролей, для которых назначено указанное право. </param>
         /// <returns> Возвращает монаду с табличными данными ролей для права. </returns>
-        Either<Error, DtoGridPermission> GetGridPermissionRoles(DtoGridQueryPermission gridQueryPermission);
+        Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermission gridQueryPermission);
 
         /// <summary>
         /// Назначить роли для пользователя.
