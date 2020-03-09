@@ -216,7 +216,7 @@
             return result;
         }
 
-        public Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermission gridQuery)
+        public Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermissionRoles gridQuery)
         {
             var dbQuery = _appContext.RolePermissions.AsQueryable();
             var optionFilter = gridQuery.Filter;
@@ -228,6 +228,19 @@
             var result = new DtoGridRole(rows, _appContext.Roles.Count());
 
             return Right<Error, DtoGridRole>(result);
+        }
+
+        public Either<Error, DtoGridPermission> GetGridPermissions(DtoGridQueryPermission gridQuery)
+        {
+            var dbQuery = _appContext.Permissions.AsQueryable();
+            var optionFilter = gridQuery.Filter;
+
+            optionFilter.Bind(filter => dbQuery = dbQuery.Where(permission => permission.Name.Contains(filter.Name)));
+
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(role => new DtoRowPermission(role.Name, role.Id));
+            var result = new DtoGridPermission(rows, _appContext.Roles.Count());
+
+            return Right<Error, DtoGridPermission>(result);
         }
     }
 }

@@ -5,10 +5,10 @@
     /// <summary>
     /// DTO для получения табличных записей прав.
     /// </summary>
-    public class DtoGridQueryPermission : AbstractGridQuery<DtoFilterById>
+    public class DtoGridQueryPermission : AbstractGridQuery<DtoPermissionFilter>
     {
         /// <inheritdoc />
-        public DtoGridQueryPermission(DtoFilterById filter, Pagination pagination)
+        public DtoGridQueryPermission(DtoPermissionFilter filter, Pagination pagination)
             : base(filter, pagination)
         {
         }

@@ -74,7 +74,7 @@
         /// </summary>
         /// <param name="gridQueryPermission"> Запрос на получение табличных записей ролей, для которых назначено указанное право. </param>
         /// <returns> Возвращает монаду с табличными данными ролей для права. </returns>
-        Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermission gridQueryPermission);
+        Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermissionRoles gridQueryPermission);
 
         /// <summary>
         /// Назначить роли для пользователя.
@@ -100,9 +100,9 @@
         /// <summary>
         /// Получить права.
         /// </summary>
-        /// <param name="gridQuerypermission"> Запрос на получение табличных записей прав. </param>
+        /// <param name="gridQueryPermission"> Запрос на получение табличных записей прав. </param>
         /// <returns> Возвращает монаду с табличными данными прав. </returns>
-        Either<Error, DtoGridPermission> GetGridPermissions(DtoGridQueryPermission gridQuerypermission);
+        Either<Error, DtoGridPermission> GetGridPermissions(DtoGridQueryPermission gridQueryPermission);
 
         /// <summary>
         /// Получить права пользователя.

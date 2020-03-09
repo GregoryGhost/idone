@@ -86,7 +86,7 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermission gridQueryPermission)
+        public Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermissionRoles gridQueryPermission)
         {
             var result = _userService.GetGridPermissionRoles(gridQueryPermission);
 
@@ -94,9 +94,11 @@
         }
 
         /// <inheritdoc />
-        public Either<Error, DtoGridPermission> GetGridPermissions(DtoGridQueryPermission gridQuerypermission)
+        public Either<Error, DtoGridPermission> GetGridPermissions(DtoGridQueryPermission gridQueryPermission)
         {
-            throw new NotImplementedException();
+            var result = _userService.GetGridPermissions(gridQueryPermission);
+
+            return result;
         }
 
         /// <inheritdoc />
