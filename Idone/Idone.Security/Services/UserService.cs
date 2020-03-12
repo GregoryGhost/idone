@@ -122,11 +122,10 @@
 
         public Either<Error, Success> SetUserRoles(DtoLinkUserRoles linkUserRoles)
         {
-            var roles = linkUserRoles.RoleIds.Select(role => _appContext.Roles.Find<Role>(role));
-            var result = _appContext.Users.Find<User>(linkUserRoles.UserId).Bind(
+            var result = _appContext.Users.FindEither(linkUserRoles.UserId).Bind(
                 user =>
                 {
-                    roles.Select(
+                    linkUserRoles.RoleIds.Select(role => _appContext.Roles.Find<Role>(role)).Select(
                         role => 
                         {
                             UserRole.Create(user, role).Bind<EntityEntry<UserRole>>(link =>
@@ -134,10 +133,10 @@
                             return Right<Error, Role>(role);
                         });
                     var t = _appContext.TrySaveChanges().Bind<Success>(_ => Success.ItsSuccess);
-                    return t.ToOption();//TODO: костыль, конечно))
+                    return t;
                 });
 
-            return result.ToEither(Error.Exception);//TODO: костыль, конечно))
+            return result;
         }
 
         public Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUserRole gridQuery)
