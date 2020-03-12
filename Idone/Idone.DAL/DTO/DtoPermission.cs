@@ -4,9 +4,10 @@
 
     public class DtoPermission: Record<DtoPermission>, IIdentity
     {
-        public DtoPermission(string name)
+        public DtoPermission(int id, string name)
         {
             Name = name;
+            Id = id;
         }
 
         public string Name { get; }

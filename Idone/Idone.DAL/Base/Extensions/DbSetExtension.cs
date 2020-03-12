@@ -1,5 +1,7 @@
 ﻿namespace Idone.DAL.Base.Extensions
 {
+    using Idone.DAL.Dictionaries;
+
     using LanguageExt;
 
     using Microsoft.EntityFrameworkCore;
@@ -36,6 +38,12 @@
             return searchResult != null
                 ? Some(searchResult)
                 : None;
+        }
+
+        public static Either<Error, T> FindEither<T>(this DbSet<T> dbSet, params object[] keyValues)
+            where T : class
+        {
+            return dbSet.Find<T>(keyValues).ToEither(Error.NotFoundRecord);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Idone.DAL.Entities
 {
     using Idone.DAL.Dictionaries;
+    using Idone.DAL.DTO;
 
     using LanguageExt;
 
@@ -40,6 +41,17 @@
             };
 
             return permission;
+        }
+
+        public static Either<Error, Permission> Create(DtoNewPermission newPermission)
+        {
+            var user = new Permission
+            {
+                Description = newPermission.Description,
+                Name = newPermission.Name
+            };
+
+            return user;
         }
     }
 }

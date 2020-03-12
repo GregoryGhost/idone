@@ -31,12 +31,12 @@
         /// </summary>
         public Role Role { get; private set; }
 
-        public Either<Error, RolePermission> Create(Permission permission, Role role)
+        public static Either<Error, RolePermission> Create(Permission permission, Role role)
         {
             return new RolePermission
             {
                 Permission = permission,
-                Role = Role
+                Role = role
             };
         }
     }

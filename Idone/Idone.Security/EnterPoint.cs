@@ -37,18 +37,23 @@
         /// <inheritdoc />
         public Either<Error, Success> AllowRolePermissions(DtoLinkRolePermissions linkRolePermissions)
         {
-            throw new NotImplementedException();
+            var result = _userService.AllowRolePermissions(linkRolePermissions);
+
+            return result;
         }
 
         /// <inheritdoc />
         public Either<Error, DtoPermission> CreatePermissions(DtoNewPermission newPermission)
         {
-            throw new NotImplementedException();
+            var result = _userService.CreatePermissions(newPermission);
+
+            return result;
         }
 
         /// <inheritdoc />
         public Either<Error, DAL.DTO.DtoRole> CreateRole(DtoNewRole newRole)
         {
+            //TODO: не стыковка API - в описании модуля создание одной роли, в методе юзер сервиса написано создание ролей, но создает все равно одну роль.
             var result = _userService.CreateRoles(newRole);
 
             return result;
@@ -57,7 +62,9 @@
         /// <inheritdoc />
         public Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions linkRolePermissions)
         {
-            throw new NotImplementedException();
+            var result = _userService.DenyRolePermissions(linkRolePermissions);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -136,7 +143,9 @@
         /// <inheritdoc />
         public Either<Error, DtoPermission> GetPermissionById(int permId)
         {
-            throw new NotImplementedException();
+            var result = _userService.GetPermissionById(permId);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -182,7 +191,9 @@
         /// <inheritdoc />
         public Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles linkUserRoles)
         {
-            throw new NotImplementedException();
+            var result = _userService.UnsetUserRoles(linkUserRoles);
+
+            return result;
         }
     }
 }

@@ -11,7 +11,7 @@
         /// Конструктор по умолчанию.
         /// </summary>
         /// <param name="name"> Название роли. </param>
-        public DtoRole(string name)
+        public DtoRole(int id, string name)
         {
             Name = name;
         }

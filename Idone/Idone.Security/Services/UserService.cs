@@ -95,7 +95,7 @@
                 }).Bind(
                 role =>
                 {
-                    var createdRole = new DtoRole(role.Name);
+                    var createdRole = new DtoRole(role.Id, role.Name);
                     return Right<Error, DtoRole>(createdRole);
                 });
 
@@ -168,11 +168,6 @@
             return Right<Error, DtoGridUser>(result);
         }
 
-        public Either<Error, DtoRole> GetRoleById(int roleId)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public Either<Error, DtoGridPermission> GetGridRolePermissions(DtoGridQueryRolePermission gridQuery)
         {
             var dbQuery = _appContext.RolePermissions.AsQueryable();
@@ -241,6 +236,90 @@
             var result = new DtoGridPermission(rows, _appContext.Roles.Count());
 
             return Right<Error, DtoGridPermission>(result);
+        }
+        
+        public Either<Error, DtoRole> GetRoleById(int roleId)
+        {
+            var dbQuery = _appContext.Roles.AsQueryable().FirstOrDefault(role => role.Id == roleId) ?? Left<Error, Role>(Error.NotFoundRecord);
+
+            var result = dbQuery.Bind<DtoRole>(x => new DtoRole(x.Id, x.Name));
+
+            return result;
+        }
+
+        public Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles link)
+        {
+            var dbQuery = _appContext.UserRoles.AsQueryable();
+            var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.UserId) ?? Left<Error, UserRole>(Error.NotFoundRecord);
+
+            var result = foundUser.Bind(userRole =>
+            {
+                _appContext.UserRoles.Remove(userRole);
+                var t = _appContext.TrySaveChanges().Bind<Success>(_ => Success.ItsSuccess);
+                return t;
+            });
+            
+            return result;
+        }
+
+        public Either<Error, DtoPermission> GetPermissionById(int permId)
+        {
+            var dbQuery = _appContext.Permissions.AsQueryable().FirstOrDefault(permission => permission.Id == permId) ?? Left<Error, Permission>(Error.NotFoundRecord);
+
+            var result = dbQuery.Bind<DtoPermission>(x => new DtoPermission(x.Id, x.Name));
+
+            return result;
+        }
+
+        public Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions link)
+        {
+            var dbQuery = _appContext.RolePermissions.AsQueryable();
+            var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.RoleId) ?? Left<Error, RolePermission>(Error.NotFoundRecord);
+
+            var result = foundUser.Bind(rolePermission =>
+            {
+                _appContext.RolePermissions.Remove(rolePermission);
+                var t = _appContext.TrySaveChanges().Bind<Success>(_ => Success.ItsSuccess);
+                return t;
+            });
+            
+            return result;
+        }
+
+        public Either<Error, DtoPermission> CreatePermissions(DtoNewPermission newPermission)
+        {
+            //TODO: опять не состыковочка в названии метода, проверить с тестами, может имеет смысл исправить интерфейс метода.
+            var result = Permission.Create(newPermission).Bind(
+                permission =>
+                {
+                    _appContext.Permissions.Add(permission);
+                    return _appContext.TrySaveChanges().Bind<Permission>(_ => permission);
+                }).Bind(
+                permission =>
+                {
+                    var createdPermission = new DtoPermission(permission.Id, permission.Name);
+                    return Right<Error, DtoPermission>(createdPermission);
+                });
+
+            return result;
+        }
+
+        public Either<Error, Success> AllowRolePermissions(DtoLinkRolePermissions link)
+        {
+            var result = _appContext.Roles.FindEither(link.RoleId).Bind(
+                role =>
+                {
+                    link.PermissionIds.Select(permission => _appContext.Permissions.Find<Permission>(permission)).Select(
+                        permission => 
+                        {
+                            RolePermission.Create(permission, role).Bind<EntityEntry<RolePermission>>(x => _appContext.RolePermissions.Add(x));
+                            return Right<Error, Permission>(permission);
+                        });
+                    var t = _appContext.TrySaveChanges().Bind<Success>(_ => Success.ItsSuccess);
+                    return t;
+                });
+
+            return result;
         }
     }
 }

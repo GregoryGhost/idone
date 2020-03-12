@@ -8,6 +8,7 @@
         /// <summary>
         /// Исключение, подробности смотреть в логах.
         /// </summary>
-        Exception = 0
+        Exception = 0,
+        NotFoundRecord,
     }
 }
