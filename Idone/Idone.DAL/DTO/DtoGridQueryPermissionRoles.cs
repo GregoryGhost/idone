@@ -2,9 +2,9 @@ namespace Idone.DAL.DTO
 {
     using Idone.DAL.Base;
 
-    public class DtoGridQueryPermissionRoles:  AbstractGridQuery<DtoFilterById>
+    public class DtoGridQueryPermissionRoles:  AbstractGridQuery<IIdentity>
     {
-        public DtoGridQueryPermissionRoles(DtoFilterById filter, Pagination pagination)
+        public DtoGridQueryPermissionRoles(IIdentity filter, Pagination pagination)
             : base(filter, pagination)
         {
         }

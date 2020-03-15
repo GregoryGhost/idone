@@ -10,13 +10,15 @@ open Idone.DAL.Dictionaries
 open Idone.Tests.Types
 open Idone.Tests.Extensions
 open Idone.Tests.Helpers.IdoneApiHelper
+open Idone.Tests.Helpers.TypeWorkers
 
 open Idone.Security
-open LanguageExt
 
 
 type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     let _module = new EnterPoint(servicesProvider) :> ISecurityModule
+    let _roleWorker = new RoleWorker(_module)
+    let _permWorker = new PermissionWorker(_module)
     
     member __.RegistrateUser (registrateUser : DtoRegistrateUser) : Either<Error, DtoRegistratedUser> = 
         _module.RegistrateUser registrateUser
@@ -60,7 +62,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> reduceAllRights |> Seq.toList
         
     member __.GetGridRoles (gridQueryRole : DtoGridQueryRole) : Either<Error, DtoGridRole> =
-        _module.GetGridRoles gridQueryRole
+        _roleWorker.GetGridEntities gridQueryRole
         
     member __.GetGridUserRoles (gridQueryUserRole : DtoGridQueryUserRole) : Either<Error, DtoGridRole> =
         _module.GetGridUserRoles gridQueryUserRole
@@ -77,13 +79,10 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> reduceAllRights |> Seq.toList
 
     member __.FindRole (role : Role) : Either<Error, DtoRowRole> =
-        role |> toDefaultGridQueryRole |> __.GetGridRoles >>= takeFirstRow
+        _roleWorker.FindEntity role
 
     member __.GetRoleIds (roles : Role list) : #IIdentity seq =
-        roles |> List.map (fun role -> either {
-                return! __.FindRole role })
-        |> reduceAllRights 
-        |> Seq.map (fun role -> new DtoFilterById(role.Id) :> IIdentity)
+        _roleWorker.GetEntityIds roles
 
     member __.CreatePermissions (newPerms : Perm list) : DtoPermission list =
         newPerms |> preparePermData
@@ -100,16 +99,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> Seq.toList
 
     member __.GetRolesPermissions (roles: Role list) : DtoRowPermission list =
-        roles
-        |> __.GetRoleIds
-        |> Seq.map (fun roleId -> either {
-                let filter = toDefaultGridQueryRolePerm (roleId :?> DtoFilterById)
-                let grid = _module.GetGridRolePermissions filter
-                return! grid})
-        |> reduceAllRights
-        |> Seq.map (fun x -> takeFirstRow x)
-        |> reduceAllRights
-        |> Seq.toList
+        _roleWorker.GetDepTypes roles
 
     member __.GetPermissionsRoles (perms: Perm list) : DtoRowRole list =
-        raise (System.NotImplementedException())
+        _permWorker.GetDepTypes perms

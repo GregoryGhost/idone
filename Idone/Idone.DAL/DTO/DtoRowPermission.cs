@@ -5,7 +5,7 @@ namespace Idone.DAL.DTO
     /// <summary>
     /// DTO табличная запись права.
     /// </summary>
-    public class DtoRowPermission : Record<DtoRowPermission>
+    public class DtoRowPermission : Record<DtoRowPermission>, IIdentity
     {
         /// <summary>
         /// Конструктор по умолчанию.

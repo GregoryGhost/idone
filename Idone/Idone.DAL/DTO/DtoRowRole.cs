@@ -5,7 +5,7 @@ namespace Idone.DAL.DTO
     /// <summary>
     /// DTO строки роли в таблице ролей.
     /// </summary>
-    public class DtoRowRole : Record<DtoRowRole>
+    public class DtoRowRole : Record<DtoRowRole>, IIdentity
     {
         /// <summary>
         /// Конструктор по умолчанию.
