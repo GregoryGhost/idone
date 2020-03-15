@@ -249,7 +249,7 @@
         public Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles link)
         {
             var dbQuery = _appContext.UserRoles.AsQueryable();
-            var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.UserId) ?? Left<Error, UserRole>(Error.NotFoundRecord);
+            var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.UserId.Id) ?? Left<Error, UserRole>(Error.NotFoundRecord);
 
             var result = foundUser.Bind(userRole =>
             {

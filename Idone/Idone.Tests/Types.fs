@@ -8,6 +8,7 @@ type Role =
 type Perm =
     {
         Name : string
+        Description : string
     }
 
 type PermRoleLink =

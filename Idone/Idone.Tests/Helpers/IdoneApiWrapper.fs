@@ -45,7 +45,8 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.SetRolesForUser (roles : Role list, user : DtoRegistratedUser) : Either<Error, Success> =
         either {
             let roleIds = __.GetRoleIds roles
-            let linkUserRoles = new DtoLinkUserRoles(user.Id, roleIds)
+            let userId = new DtoFilterById(user.Id)
+            let linkUserRoles = new DtoLinkUserRoles(userId, roleIds)
             
             return! _module.SetUserRoles linkUserRoles
         }     
@@ -78,11 +79,11 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.FindRole (role : Role) : Either<Error, DtoRowRole> =
         role |> toDefaultGridQueryRole |> __.GetGridRoles >>= takeFirstRow
 
-    member __.GetRoleIds (roles : Role list) : int seq =
+    member __.GetRoleIds (roles : Role list) : #IIdentity seq =
         roles |> List.map (fun role -> either {
                 return! __.FindRole role })
         |> reduceAllRights 
-        |> Seq.map (fun role -> role.Id)
+        |> Seq.map (fun role -> new DtoFilterById(role.Id) :> IIdentity)
 
     member __.CreatePermissions (newPerms : Perm list) : DtoPermission list =
         newPerms |> preparePermData
@@ -98,10 +99,17 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> reduceAllRights
         |> Seq.toList
 
-    member __.GetRolesPermissions (roles: #IIdentity list) : DtoRowPermission list =
+    member __.GetRolesPermissions (roles: Role list) : DtoRowPermission list =
         roles
-        |> List.map (fun role -> either {
-                return! (_module.GetGridRolePermissions roleId)})
+        |> __.GetRoleIds
+        |> Seq.map (fun roleId -> either {
+                let filter = toDefaultGridQueryRolePerm (roleId :?> DtoFilterById)
+                let grid = _module.GetGridRolePermissions filter
+                return! grid})
+        |> reduceAllRights
+        |> Seq.map (fun x -> takeFirstRow x)
+        |> reduceAllRights
+        |> Seq.toList
 
-    member __.GetPermissionsRoles (perms: #IIdentity list) : DtoRowRole list =
+    member __.GetPermissionsRoles (perms: Perm list) : DtoRowRole list =
         raise (System.NotImplementedException())

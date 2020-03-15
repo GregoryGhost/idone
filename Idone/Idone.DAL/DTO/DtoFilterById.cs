@@ -5,7 +5,7 @@
     /// <summary>
     /// DTO фильтра по идентификатору сущности.
     /// </summary>
-    public class DtoFilterById : Record<DtoFilterById>
+    public class DtoFilterById : Record<DtoFilterById>, IIdentity
     {
         /// <summary>
         /// Конструктор по умолчанию.

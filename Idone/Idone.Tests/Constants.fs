@@ -15,17 +15,17 @@ module Constants =
 
     let PERMISSIONS : Perm list = 
         [
-            { Name = "" }
+            { Name = "тестовое_резрешение"; Description = "описание" }
         ]
 
     let PERMS_ROLES_LINKS : PermRoleLink list = [
         {
             Role = { Name = "админ" }
-            Perm = { Name = "разрешение1" }
+            Perm = { Name = "разрешение1"; Description = "описание" }
         };
         {
             Role = { Name = "пользователь" }
-            Perm = { Name = "разрешение2" }
+            Perm = { Name = "разрешение2"; Description = "описание" }
         }
     ]
         

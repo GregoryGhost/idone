@@ -1,4 +1,5 @@
 ﻿namespace Idone.Tests.Helpers
+open Idone.DAL.Base
 
 module IdoneApiHelper =
     open Idone.DAL.DTO
@@ -51,7 +52,11 @@ module IdoneApiHelper =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
 
     let preparePermData (perms : Perm list) : DtoNewPermission list =
-        perms |> List.map (fun perm -> new DtoNewPermission(perm.Name))
+        perms |> List.map (fun perm -> new DtoNewPermission(perm.Name, perm.Description))
+        
+    let toDefaultGridQueryRolePerm (filter : #IIdentity) : DtoGridQueryRolePermission =
+        let query = new DtoGridQueryRolePermission(filter, FIRST_PAGE)
+        query
         
     let inline bindData
                  (entity1 : #IIdentity list)

@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="userId"> Идентификатор пользователя. </param>
         /// <param name="roleIds"> Идентификаторы ролей пользователя. </param>
-        public DtoLinkUserRoles(int userId, IEnumerable<int> roleIds)
+        public DtoLinkUserRoles(IIdentity userId, IEnumerable<IIdentity> roleIds)
         {
             UserId = userId;
             RoleIds = roleIds;
@@ -23,11 +23,11 @@
         /// <summary>
         /// Идентификаторы ролей пользователя.
         /// </summary>
-        public IEnumerable<int> RoleIds { get; private set; }
+        public IEnumerable<IIdentity> RoleIds { get; private set; }
 
         /// <summary>
         /// Идентификатор пользователя.
         /// </summary>
-        public int UserId { get; private set; }
+        public IIdentity UserId { get; private set; }
     }
 }
