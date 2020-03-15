@@ -30,5 +30,7 @@ type RoleWorker(secModule : ISecurityModule) =
     override __.GetGridEntities (query : DtoGridQueryRole) : Either<Error, DtoGridRole> =
         _module.GetGridRoles query
         
-    override __.FindEntity (role: Role) : Either<Error, DtoRowRole> =
-        role |> toDefaultGridQueryRole |> __.GetGridEntities >>= takeFirstRow
+    override __.ToGridQueryType  (role : Role) (pagination : Pagination): DtoGridQueryRole =
+        let filter = new DtoRoleFilter(role.Name)
+        let query = new DtoGridQueryRole(filter, pagination)
+        query

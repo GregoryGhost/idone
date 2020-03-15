@@ -50,17 +50,7 @@ module IdoneApiHelper =
         
     let prepareRoleData (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
-
-    let toDefaultGridQueryRole (role : Role) : DtoGridQueryRole =
-        let filter = new DtoRoleFilter(role.Name)
-        let query = new DtoGridQueryRole(filter, FIRST_PAGE)
-        query
-        
-    let toDefaultGridQueryPerm (perm : Perm) : DtoGridQueryPermission =
-        let filter = new DtoPermissionFilter(perm.Name)
-        let query = new DtoGridQueryPermission(filter, FIRST_PAGE)
-        query
-    
+       
     let preparePermData (perms : Perm list) : DtoNewPermission list =
         perms |> List.map (fun perm -> new DtoNewPermission(perm.Name, perm.Description))
         

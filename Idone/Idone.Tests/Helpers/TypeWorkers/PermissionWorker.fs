@@ -31,5 +31,7 @@ type PermissionWorker(secModule : ISecurityModule) =
     override __.GetGridEntities (query : DtoGridQueryPermission) : Either<Error, DtoGridPermission> =
         _module.GetGridPermissions query
         
-    override __.FindEntity (perm: Perm) : Either<Error, DtoRowPermission> =
-        perm |> toDefaultGridQueryPerm |> __.GetGridEntities >>= takeFirstRow
+    override __.ToGridQueryType  (perm : Perm) (pagination : Pagination): DtoGridQueryPermission =
+        let filter = new DtoPermissionFilter(perm.Name)
+        let query = new DtoGridQueryPermission(filter, pagination)
+        query

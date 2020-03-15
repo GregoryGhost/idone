@@ -56,7 +56,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.FoundUsersOfRoles (roles : Role list) : DtoGridUser list =
         roles 
         |> List.map (fun x -> either {
-            let! gridRoles = x |> toDefaultGridQueryRole |> __.GetGridRoles
+            let! gridRoles = x |> _roleWorker.ToDefaultGridQueryType |> __.GetGridRoles
             let! firstRow = gridRoles |> takeFirstRow
             return! firstRow |> __.GetUsersOfRoles }) 
         |> reduceAllRights |> Seq.toList

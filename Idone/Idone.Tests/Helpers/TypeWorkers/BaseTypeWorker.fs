@@ -7,6 +7,7 @@ open Idone.DAL.Dictionaries
 open Idone.Tests.Extensions
 open Idone.Tests.Helpers.IdoneApiHelper
 
+open Idone.Tests.Constants
 open LanguageExt
 
 [<AbstractClass>]            
@@ -25,8 +26,15 @@ type BaseTypeWorker<
     
                 
     abstract member GetGridDepType  : #IIdentity       -> Either<Error, 'TTypeDepGrid>
-    abstract member FindEntity      : 'TType           -> Either<Error, 'TRowType>
     abstract member GetGridEntities : 'TTypeGridQuery  -> Either<Error, 'TTypeGrid>
+    abstract member ToGridQueryType : 'TType           -> Pagination -> 'TTypeGridQuery
+    
+    
+    member __.ToDefaultGridQueryType (entity: 'TType): 'TTypeGridQuery =
+        __.ToGridQueryType entity Constants.FIRST_PAGE
+        
+    member __.FindEntity (entity: 'TType): Either<Error, 'TRowType>   =
+        entity |> __.ToDefaultGridQueryType |> __.GetGridEntities >>= takeFirstRow 
     
     member __.GetEntityIds (entities: 'TType seq): #IIdentity seq =
         entities
