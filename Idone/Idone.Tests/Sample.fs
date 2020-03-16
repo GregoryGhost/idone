@@ -4,6 +4,7 @@ module Tests =
 
     open Expecto
     open LanguageExt
+    open LanguageExt.UnsafeValueAccess
 
     open Idone.Security
     open Idone.DAL.DTO
@@ -145,15 +146,50 @@ module Tests =
         }
 
         test "Назначены права для пользователя(через роли)" {
-            //1. Зарегистрировать пользователя
-            //2. Создать роли
-            //3. Назначить права для роли
-            //3. Назначить роли пользователю
-            //4. Получить роли пользователя
-            //5. Получить права ролей
-            //6. Получить права пользователя
-            //7. Получить пользователей для права
-            Expect.equal 1 1
+            //Создать роли
+            //Создать права
+            //Назначить права для роли
+            //Зарегистрировать пользователя
+            //Назначить роли пользователю
+            //Получить права пользователя
+            //Сравнить назначенныые права и полученные права
+            let startRoles = PERMS_ROLES_LINKS |> getRoles
+            let startPerms = PERMS_ROLES_LINKS |> getPerms
+            let linksLength = List.length PERMS_ROLES_LINKS
+
+            let createdRoles = 
+                    startRoles |> _security.CreateRoles
+            Expect.hasLength <||| (createdRoles,
+                                    linksLength,
+                                    "Не удалось создать роли")
+
+            let createdPerms =
+                startPerms |> _security.CreatePermissions
+            Expect.hasLength <||| (createdPerms,
+                                    linksLength, 
+                                    "Не удалось создать права")
+            let rolePermLinks =
+                bindData createdRoles createdPerms
+            let result = 
+                _security.SetPermissionsForRole(rolePermLinks)
+            Expect.hasLength <||| (result,
+                            linksLength,
+                            "Не удалось назначить права для ролей")
+            
+            let userPerms = either {
+                let! registratedUser =
+                    _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
+                let! resultSettedUserRoles=
+                    _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)
+                return! registratedUser |> fillGridQueryUserPerms |> _security.GetUserPermissions
+            }
+            
+            Expect.isRight userPerms "Не найдены пользовательские права"
+            
+            let actualUserPerms = userPerms.ValueUnsafe()
+            let expectedUserPerms = startPerms
+            Expect.sequenceEqual actualUserPerms expectedUserPerms "Не совпадают пользовательские права"
+            
+            clearRolesPerms() |> ignore
         }
-        //TODO: добавить тесты для проверки работы с ролями, правами, пользователями
       ]
