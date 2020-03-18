@@ -186,9 +186,8 @@ module Tests =
             
             Expect.isRight userPerms "Не найдены пользовательские права"
             
-            let actualUserPerms = userPerms.ValueUnsafe()
-            let expectedUserPerms = startPerms
-            Expect.sequenceEqual actualUserPerms expectedUserPerms "Не совпадают пользовательские права"
+            let actualUserPerms = userPerms.ValueUnsafe().Rows
+            Expect.hasLength actualUserPerms linksLength "Не найдены пользовательские права"
             
             clearRolesPerms() |> ignore
         }

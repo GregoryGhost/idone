@@ -103,3 +103,6 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
 
     member __.GetPermissionsRoles (perms: Perm list) : DtoRowRole list =
         _permWorker.GetDepTypes perms
+        
+    member __.GetUserPermissions (gridQueryUserPerm : DtoGridQueryUserPermission) : Either<Error, DtoGridPermission> =
+        _module.GetGridUserPermissions gridQueryUserPerm

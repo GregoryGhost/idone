@@ -43,6 +43,11 @@ module IdoneApiHelper =
         let query = new DtoGridQueryRoleUser(filter, FIRST_PAGE)
         query
         
+    let fillGridQueryUserPerms (registratedUser : DtoRegistratedUser) : DtoGridQueryUserPermission =
+        let filter = new DtoFilterById(registratedUser.Id)
+        let query = new DtoGridQueryUserPermission(filter, FIRST_PAGE)
+        query
+        
     let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =
         records
         |> Seq.distinct
