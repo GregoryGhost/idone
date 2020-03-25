@@ -26,12 +26,18 @@
         private readonly UserService _userService;
 
         /// <summary>
+        /// Сервис по работе с AD-пользователя.
+        /// </summary>
+        private readonly AdService _adService;
+
+        /// <summary>
         /// Конструктор с инициализацией зависимостей модуля.
         /// </summary>
         /// <param name="serviceProvider"> Коллекция сервисов. </param>
         public EnterPoint(IServiceProvider serviceProvider)
         {
             _userService = serviceProvider.GetService<UserService>();
+            _adService = serviceProvider.GetService<AdService>();
         }
 
         /// <inheritdoc />
@@ -70,26 +76,9 @@
         /// <inheritdoc />
         public Either<Error, IEnumerable<DtoAdUser>> FindUsersByDisplayName(string searchExpression)
         {
-            //TODO: выделить в метод сервиса AdService
-            var ctx = new PrincipalContext(ContextType.Domain, "tomskasu");
-            var query = new UserPrincipal(ctx)
-            {
-                DisplayName = searchExpression
-            };
+            var result = _adService.FindUsersByDisplayName(searchExpression);
 
-            var foundUsers = new PrincipalSearcher(query).FindAll().Where(user => user.DisplayName != null).Select(
-                userData =>
-                {
-                    var user = userData as UserPrincipal;
-                    return new DtoAdUser(
-                        user?.Sid.Value,
-                        user?.Surname,
-                        user?.GivenName,
-                        user?.MiddleName ?? string.Empty,
-                        user?.EmailAddress);
-                });
-
-            return Right<Error, IEnumerable<DtoAdUser>>(foundUsers);
+            return result;
         }
 
         /// <inheritdoc />

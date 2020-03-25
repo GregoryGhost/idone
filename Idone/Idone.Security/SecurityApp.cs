@@ -16,7 +16,10 @@
         /// <returns> Возвращает сервисы. </returns>
         public static IServiceCollection AddSecurityDi(this IServiceCollection services)
         {
-            return services.AddScoped<UserService>();
+            services.AddScoped<UserService>();
+            services.AddScoped<AdService>();
+
+            return services;
         }
     }
 }

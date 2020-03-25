@@ -20,7 +20,7 @@
         Either<Error, DtoRegistratedUser> RegistrateUser(DtoRegistrateUser registrateUser);
 
         /// <summary>
-        /// Найти пользователя по отображаемому имени.
+        /// Найти пользователей по отображаемому имени.
         /// </summary>
         /// <param name="searchExpression"> Шаблон поиска. </param>
         /// <returns> Возращает монаду с найденными совпадениями пользователей по отображаемому имени. </returns>
