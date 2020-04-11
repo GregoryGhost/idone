@@ -68,16 +68,7 @@ module Tests =
     let inline toDict (map : ('a * 'b) list) : IDictionary<'a, 'b> =
         map |> Map.ofList |> Map.toSeq |> dict
         
-    let private getLocalIpAddress () : string =
-        let hostName = Dns.GetHostName()
-        let localIp = Dns.GetHostByName(hostName).AddressList.FirstOrDefault()
-        if localIp = null then
-            raise <| new Exception("Don't found local ip address")
-        else
-            localIp.ToString()
-        
     let private getContainer (client : DockerClient) (image : string) (tag : string) : ContainerResponse =
-         let hostPort = "1433"//(new Random(int <| DateTime.UtcNow.Ticks)).Next(10000, 12000)
          let imagesList = new ImagesListParameters()
          let imageMatchName = sprintf "%s:%s" image tag
          imagesList.MatchName <- imageMatchName
@@ -85,7 +76,6 @@ module Tests =
          let containerResponse() =
              async {
                  let! images = client.Images.ListImagesAsync(imagesList, cancellationToken = CancellationToken.None) |> Async.AwaitTask
-                 
                  let pgImage = images.FirstOrDefault()
                  if pgImage = null then
                     let errorMsg = sprintf "Docker image for %s:%s not found" image tag
@@ -94,15 +84,14 @@ module Tests =
                     
                  let containerParameters : ContainerParams =
                     let cp = new CreateContainerParameters()
-//                    cp.User <- "gregory"
-                    cp.Env <- ["ACCEPT_EULA=Y"; "SA_PASSWORD=<qweQWE1234>";"Database=IdoneTests"] |> ResizeArray<string>
-                    cp.ExposedPorts <- [hostPort, new EmptyStruct()] |> toDict 
+                    cp.Env <- DOCKER_DB_ENV 
+                    cp.ExposedPorts <- [DEFAULT_DOCKER_DB_PORT, new EmptyStruct()] |> toDict 
                     let hostConfig = new HostConfig()
                     let portBind = new PortBinding()
-                    let localIp = "0.0.0.0"//getLocalIpAddress()
+                    let localIp = "0.0.0.0"
                     portBind.HostIP <- localIp
-                    portBind.HostPort <- sprintf "%s/tcp" hostPort
-                    hostConfig.PortBindings <- [hostPort, [portBind] |> ResizeArray<PortBinding> :> IList<PortBinding> ] |> toDict
+                    portBind.HostPort <- sprintf "%s/tcp" DEFAULT_DOCKER_DB_PORT
+                    hostConfig.PortBindings <- [DEFAULT_DOCKER_DB_PORT, [portBind] |> ResizeArray<PortBinding> :> IList<PortBinding> ] |> toDict
                     cp.HostConfig <- hostConfig
                     cp.Image <- imageMatchName
                     
@@ -122,26 +111,24 @@ module Tests =
                      let errorMsg = sprintf "Couldn't start container: %s" container.ID
                      eprintfn "Exception: %s" errorMsg
                      return raise <| new Exception(errorMsg)
-                 let portBinding =
-                     async {
-                         let mutable count = 10
-                         Thread.Sleep(5000)
-                         let getContainerResponse() = client.Containers.InspectContainerAsync(container.ID, CancellationToken.None)|> Async.AwaitTask
-                         let! response = getContainerResponse()
-                         let mutable containerStat = response
-                         while not containerStat.State.Running && count > 0 do
-                            count <- count - 1
-                            Thread.Sleep(1000)
-                            let! response = getContainerResponse()
-                            containerStat <- response
-                            
-                         printfn "debug: %s" <| Newtonsoft.Json.JsonConvert.SerializeObject containerStat
-                         return (containerStat.HostConfig.PortBindings.TryGetValue(hostPort) |> takeFirst |> (fun x -> x.ValueUnsafe().First()))
-                     } |> Async.RunSynchronously
                      
-                 return { Response = container; HostPort = hostPort; Ip = "172.17.0.4" }
-                 //TODO: переписать на получение адреса и порта контейнера БД от докера
-         }
+                 let! dataBaseIp =
+                     async {
+                         let! _ = Async.Sleep 10000
+                         let! containerStat =
+                             client.Containers.InspectContainerAsync(container.ID, CancellationToken.None)
+                             |> Async.AwaitTask
+                            
+                         let ipDb =
+                             containerStat.NetworkSettings.Networks
+                                 .TryGetValue("bridge").ValueUnsafe()
+                                 .IPAddress
+                         
+                         return ipDb
+                      }
+                     
+                 return { Response = container; HostPort = DEFAULT_DOCKER_DB_PORT; Ip = dataBaseIp }
+             }
          Async.RunSynchronously <| containerResponse()
          
     let private removeDockerContainer (docker : Docker) : Async<unit> =
@@ -181,28 +168,21 @@ module Tests =
             let containerInfo = getContainer dockerClient "mcr.microsoft.com/mssql/server" "2019-CU3-ubuntu-18.04"
             (containerInfo.Response, containerInfo.HostPort, containerInfo.Ip)
         
-        let connString = sprintf "Server=%s,%s;Database=IdoneTests;User ID=SA;Password=<qweQWE1234>;Trusted_Connection=False;" dbIp hostPort
-       //TODO: все данные для подключения нужно загнать в константы
-        try
-            let di = initDi connString
-            let dbEnv = TestEnviroment.create di dockerClient containerResponse
-            dbEnv
-        with
-            | :? Exception as ex ->
-                let docker = { Client = dockerClient; ContainerResponse = containerResponse  }
-                removeDockerContainer docker
-                eprintf "connString: %s" connString
-                raise ex
-                
-    let private initTestEnviroment2() : ServiceProvider =
-        let connString = sprintf "Server=%s,%s;Database=IdoneTests;User ID=SA; Password=<qweQWE1234>;Trusted_Connection=False;" "172.17.0.4" "1433"
-       
-        try
-            initDi connString
-        with
-            | :? Exception as ex ->
-                eprintf "connString: %s" connString
-                raise ex
+        let connString = makeDatabaseSettings { IpAddress = dbIp; Port = hostPort }
+        
+        let di = 
+            try
+               initDi connString 
+            with
+                | :? Exception as ex ->
+                    let docker = { ContainerResponse = containerResponse; Client = dockerClient }
+                    eprintf "connstring = %s" connString
+                    removeDockerContainer docker |> Async.RunSynchronously
+                    raise ex
+        
+        let dbEnv = TestEnviroment.create di dockerClient containerResponse
+        
+        dbEnv
         
     let private tearDownAfterAllTest (docker : Docker) (test : Test) : Test =
         removeDockerContainer docker |> Async.RunSynchronously
@@ -211,11 +191,9 @@ module Tests =
 
     [<Tests>]
     let tests =
-//      let testEnv2 = initTestEnviroment2()
       let testEnv = initTestEnviroment()
       let _servicesProvider = testEnv.ServiceProvider
       let _docker = testEnv.Docker
-//      let _servicesProvider = testEnv2
       
       let _security = new SecurityModuleWrapper(_servicesProvider)
 
