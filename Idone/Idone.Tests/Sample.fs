@@ -1,6 +1,4 @@
 namespace Idone.Tests
-open Microsoft.Extensions.DependencyInjection
-open System.Threading
 
 module Tests = 
 
@@ -17,6 +15,7 @@ module Tests =
     open Idone.Tests.Extensions
     open Idone.Tests.Helpers
     open Idone.Tests.Helpers.IdoneApiHelper
+    open Idone.Tests.Types
 
     open Microsoft.Extensions.Configuration
     open Microsoft.Extensions.DependencyInjection
@@ -25,45 +24,9 @@ module Tests =
     open System
     open System.Linq
     open System.Collections.Generic
-    open System.Net;
+    open System.Threading
     
-    type AppContext = Idone.DAL.Base.AppContext
-   
-    type Docker =
-        {
-            Client : DockerClient
-            ContainerResponse: CreateContainerResponse
-        }
-        
-    type TestEnviroment =
-        {
-            ServiceProvider : ServiceProvider
-            Docker : Docker
-        }
-        static member create (provider : ServiceProvider)
-                      (dockerClient : DockerClient)
-                      (containerResponse : CreateContainerResponse) : TestEnviroment =
-            {
-                ServiceProvider = provider
-                Docker =
-                    {
-                        Client = dockerClient
-                        ContainerResponse = containerResponse
-                    }
-            }
-            
-    type ContainerResponse =
-        {
-            Response : CreateContainerResponse
-            HostPort : string
-            Ip: string
-        }
-        
-    type ContainerParams =
-        {
-            ContainerParameters : CreateContainerParameters
-            LocalIp : string
-        }
+    type AppContext = Idone.DAL.Base.AppContext  
         
     let inline toDict (map : ('a * 'b) list) : IDictionary<'a, 'b> =
         map |> Map.ofList |> Map.toSeq |> dict

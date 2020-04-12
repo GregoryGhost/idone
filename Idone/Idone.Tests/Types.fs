@@ -1,5 +1,10 @@
 namespace Idone.Tests.Types   
 
+open Docker.DotNet
+open Docker.DotNet.Models
+open Microsoft.Extensions.DependencyInjection
+
+
 type Role =
     {
         Name : string
@@ -58,3 +63,39 @@ type DockerDatabaseEnv =
             "SA_PASSWORD" ^ __.SaPswd
             "Database" ^ __.Database 
         ] |> ResizeArray<string>
+        
+type Docker =
+    {
+        Client : DockerClient
+        ContainerResponse: CreateContainerResponse
+    }
+    
+type TestEnviroment =
+    {
+        ServiceProvider : ServiceProvider
+        Docker : Docker
+    }
+    static member create (provider : ServiceProvider)
+                  (dockerClient : DockerClient)
+                  (containerResponse : CreateContainerResponse) : TestEnviroment =
+        {
+            ServiceProvider = provider
+            Docker =
+                {
+                    Client = dockerClient
+                    ContainerResponse = containerResponse
+                }
+        }
+        
+type ContainerResponse =
+    {
+        Response : CreateContainerResponse
+        HostPort : string
+        Ip: string
+    }
+    
+type ContainerParams =
+    {
+        ContainerParameters : CreateContainerParameters
+        LocalIp : string
+    }
