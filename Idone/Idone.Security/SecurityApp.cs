@@ -2,6 +2,7 @@
 {
     using Idone.Security.Services;
 
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -14,10 +15,13 @@
         /// </summary>
         /// <param name="services"> Сервисы. </param>
         /// <returns> Возвращает сервисы. </returns>
-        public static IServiceCollection AddSecurityDi(this IServiceCollection services)
+        public static IServiceCollection AddSecurityDi(this IServiceCollection services, IConfiguration config)
         {
+            //TODO: при разрастании параметров выделить в отдельный класс десериализации настроек
+            var adDomain = config.GetSection("ActiveDirectory").GetSection("domain").Value;
+
             services.AddScoped<UserService>();
-            services.AddScoped<AdService>();
+            services.AddScoped(s => new AdService(adDomain));
 
             return services;
         }

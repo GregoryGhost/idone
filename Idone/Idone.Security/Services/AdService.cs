@@ -1,8 +1,10 @@
 namespace Idone.Security.Services
 {
+    using System;
     using System.Collections.Generic;
     using System.DirectoryServices.AccountManagement;
     using System.Linq;
+    using System.Net;
 
     using Idone.DAL.Dictionaries;
     using Idone.DAL.DTO;
@@ -18,7 +20,28 @@ namespace Idone.Security.Services
     /// </summary>
     internal class AdService
     {
-        private const string DOMAIN = "tomskasu";
+        /// <summary>
+        /// Домен сервиса Active Directory. 
+        /// </summary>
+        private readonly string _domain;
+
+        /// <summary>
+        /// Инициализировать зависимости.
+        /// </summary>
+        /// <param name="domain">Домен сервиса Active Directory.</param>
+        public AdService(string domain)
+        {
+            if (string.IsNullOrEmpty(domain))
+            {
+                throw new NullReferenceException($"Пустой аргумент {nameof(domain)}");
+            }
+            if (!Dns.GetHostAddresses(domain).Any())
+            {
+                var msg = $"Не найден домен сервиса Active Directory для переданного аргумента {nameof(domain)}";
+                throw new ArgumentException(msg);
+            }
+            _domain = domain;
+        }
 
         /// <summary>
         /// Найти пользователей по отображаемому имени.
@@ -27,8 +50,7 @@ namespace Idone.Security.Services
         /// <returns> Возращает монаду с найденными совпадениями пользователей по отображаемому имени. </returns>
         public Either<Error, IEnumerable<DtoAdUser>> FindUsersByDisplayName(string searchExpression)
         {
-            //TODO: вынести домен в настройки
-            using (var ctx = new PrincipalContext(ContextType.Domain, DOMAIN))
+            using (var ctx = new PrincipalContext(ContextType.Domain, _domain))
             using (var query = new UserPrincipal(ctx)
             {
                 DisplayName = searchExpression
@@ -57,7 +79,7 @@ namespace Idone.Security.Services
         /// <returns>Результат операции.</returns>
         public Either<Error, Success> CreateUser(DtoNewAdUser newUser)
         {
-            using (var ctx = new PrincipalContext(ContextType.Domain, DOMAIN))
+            using (var ctx = new PrincipalContext(ContextType.Domain, _domain))
             using (var query = new UserPrincipal(ctx))
             {
                 query.SamAccountName = newUser.Nickname;

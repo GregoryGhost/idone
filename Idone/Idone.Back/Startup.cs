@@ -36,7 +36,7 @@
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).Services
                     .AddIdoneIdentity()
                     .AddIdoneDb(connString)
-                    .AddSecurityDi();
+                    .AddSecurityDi(Configuration);
         }
     }
 }
