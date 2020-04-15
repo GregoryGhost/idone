@@ -30,6 +30,29 @@ module Tests =
         
     let inline toDict (map : ('a * 'b) list) : IDictionary<'a, 'b> =
         map |> Map.ofList |> Map.toSeq |> dict
+    
+    let private pullImage (client : DockerClient) (image : string) (tag : string) : Async<unit> =
+        async {
+            let createParams = new ImagesCreateParameters()
+            createParams.FromImage <- image
+            let report = new Progress<JSONMessage>(fun msg ->
+                printfn "%s|%s|%s" msg.Status msg.ProgressMessage msg.ErrorMessage)
+            let! _ =
+                client.Images.CreateImageAsync(createParams, new AuthConfig(), report)
+                |> Async.AwaitTask
+                
+            printfn "Ok pulled image %s to %s" image
+            <| client.Configuration.EndpointBaseUri.ToString()
+        }
+        
+    let private getImage (client : DockerClient)
+                         (imagesList : ImagesListParameters) : Async<ImagesListResponse option> =
+         async {
+             let! images = client.Images.ListImagesAsync(imagesList, cancellationToken = CancellationToken.None) |> Async.AwaitTask
+             let foundImage = images.FirstOrDefault() |> Option.ofObj
+             
+             return foundImage
+         }
         
     let private getContainer (containerSettings: ContainerSettings) : ContainerResponse =
          let imagesList = new ImagesListParameters()
@@ -43,13 +66,11 @@ module Tests =
          imagesList.MatchName <- imageMatchName
          
          let containerResponse() =
-             async {
-                 let! images = client.Images.ListImagesAsync(imagesList, cancellationToken = CancellationToken.None) |> Async.AwaitTask
-                 let pgImage = images.FirstOrDefault()
-                 if pgImage = null then
-                    let errorMsg = sprintf "Docker image for %s:%s not found" image tag
-                    eprintfn "Exception: %s" errorMsg
-                    return raise <| new Exception(errorMsg)
+             async {                 
+                 let! foundImage = getImage client imagesList
+                 if foundImage.IsNone then
+                    printf "Docker image for %s:%s not found, try to pull" image tag
+                    pullImage client image tag
                     
                  let containerParameters : ContainerParams =
                     let cp = new CreateContainerParameters()
