@@ -65,12 +65,13 @@ module Tests =
          let imageMatchName = sprintf "%s:%s" image tag
          imagesList.MatchName <- imageMatchName
          
-         let containerResponse() =
+         let containerResponse() : Async<ContainerResponse> =
              async {                 
                  let! foundImage = getImage client imagesList
                  if foundImage.IsNone then
                     printf "Docker image for %s:%s not found, try to pull" image tag
-                    pullImage client image tag
+                    let! _ = pullImage client image tag
+                    ()
                     
                  let containerParameters : ContainerParams =
                     let cp = new CreateContainerParameters()
@@ -88,36 +89,38 @@ module Tests =
                     { ContainerParameters = cp; LocalIp = localIp }
                      
                  let! container =
-                     client.Containers.CreateContainerAsync(containerParameters.ContainerParameters, CancellationToken.None)
+                     client.Containers.CreateContainerAsync(containerParameters.ContainerParameters,
+                                                            CancellationToken.None)
                      |> Async.AwaitTask
                      
-                 let! isStartedContainerDb =
+                 let! isStartedContainer =
                      client.Containers.StartContainerAsync(
                          container.ID,
                          parameters = new ContainerStartParameters(DetachKeys = sprintf "d=%s" image),
                          cancellationToken = CancellationToken.None
                          ) |> Async.AwaitTask
-                 if not isStartedContainerDb then
+                 if not isStartedContainer then
                      let errorMsg = sprintf "Couldn't start container: %s" container.ID
                      eprintfn "Exception: %s" errorMsg
+                     
                      return raise <| new Exception(errorMsg)
                      
-                 let! dataBaseIp =
+                 let! ipAddress =
                      async {
                          let! _ = Async.Sleep 10000
                          let! containerStat =
                              client.Containers.InspectContainerAsync(container.ID, CancellationToken.None)
                              |> Async.AwaitTask
                             
-                         let ipDb =
+                         let ip =
                              containerStat.NetworkSettings.Networks
                                  .TryGetValue("bridge").ValueUnsafe()
                                  .IPAddress
                          
-                         return ipDb
+                         return ip
                       }
                      
-                 return { Response = container; HostPort = port; Ip = dataBaseIp }
+                 return { Response = container; HostPort = port; Ip = ipAddress }
              }
          Async.RunSynchronously <| containerResponse()
          
