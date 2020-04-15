@@ -35,6 +35,7 @@ namespace Idone.Security.Services
             {
                 throw new NullReferenceException($"Пустой аргумент {nameof(domain)}");
             }
+
             if (!Dns.GetHostAddresses(domain).Any())
             {
                 var msg = $"Не найден домен сервиса Active Directory для переданного аргумента {nameof(domain)}";

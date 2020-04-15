@@ -5,6 +5,11 @@ open Docker.DotNet.Models
 open Microsoft.Extensions.DependencyInjection
 
 
+module Helpers =
+    let (^) param value = sprintf "%s=%s" param value
+    
+open Helpers
+
 type Role =
     {
         Name : string
@@ -55,7 +60,6 @@ type DockerDatabaseEnv =
         Database : string
     }
     member __.toEnv : ResizeArray<string> =
-        let (^) param value = sprintf "%s=%s" param value
         let ae = if __.AcceptEula then "Y" else "F"
         
         [
@@ -64,26 +68,39 @@ type DockerDatabaseEnv =
             "Database" ^ __.Database 
         ] |> ResizeArray<string>
         
+type DockerActiveDirectoryEnv =
+    {
+        Organisation : string
+        Domain : string
+        AdminPassword : string
+    }
+    member __.toEnv : ResizeArray<string> =
+        [
+           "LDAP_ORGANISATION" ^ __.Organisation
+           "LDAP_DOMAIN" ^ __.Domain
+           "LDAP_ADMIN_PASSWORD" ^ __.AdminPassword
+        ] |> ResizeArray<string>
+        
 type Docker =
     {
         Client : DockerClient
-        ContainerResponse: CreateContainerResponse
+        Containers: CreateContainerResponse list
     }
     
-type TestEnviroment =
+type TestEnvironment =
     {
         ServiceProvider : ServiceProvider
         Docker : Docker
     }
     static member create (provider : ServiceProvider)
                   (dockerClient : DockerClient)
-                  (containerResponse : CreateContainerResponse) : TestEnviroment =
+                  (containers : CreateContainerResponse list) : TestEnvironment =
         {
             ServiceProvider = provider
             Docker =
                 {
                     Client = dockerClient
-                    ContainerResponse = containerResponse
+                    Containers = containers
                 }
         }
         
@@ -98,4 +115,13 @@ type ContainerParams =
     {
         ContainerParameters : CreateContainerParameters
         LocalIp : string
+    }
+    
+type ContainerSettings =
+    {
+        Client : DockerClient
+        Image : string
+        Tag : string
+        Port : string
+        Env : ResizeArray<string>
     }

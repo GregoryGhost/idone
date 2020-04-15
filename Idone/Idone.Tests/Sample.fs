@@ -31,8 +31,14 @@ module Tests =
     let inline toDict (map : ('a * 'b) list) : IDictionary<'a, 'b> =
         map |> Map.ofList |> Map.toSeq |> dict
         
-    let private getContainer (client : DockerClient) (image : string) (tag : string) : ContainerResponse =
+    let private getContainer (containerSettings: ContainerSettings) : ContainerResponse =
          let imagesList = new ImagesListParameters()
+         let (client, image, tag, env, port) =
+             (containerSettings.Client,
+              containerSettings.Image,
+              containerSettings.Tag,
+              containerSettings.Env,
+              containerSettings.Port)
          let imageMatchName = sprintf "%s:%s" image tag
          imagesList.MatchName <- imageMatchName
          
@@ -47,14 +53,14 @@ module Tests =
                     
                  let containerParameters : ContainerParams =
                     let cp = new CreateContainerParameters()
-                    cp.Env <- DOCKER_DB_ENV 
-                    cp.ExposedPorts <- [DEFAULT_DOCKER_DB_PORT, new EmptyStruct()] |> toDict 
+                    cp.Env <- env 
+                    cp.ExposedPorts <- [port, new EmptyStruct()] |> toDict 
                     let hostConfig = new HostConfig()
                     let portBind = new PortBinding()
                     let localIp = "0.0.0.0"
                     portBind.HostIP <- localIp
-                    portBind.HostPort <- sprintf "%s/tcp" DEFAULT_DOCKER_DB_PORT
-                    hostConfig.PortBindings <- [DEFAULT_DOCKER_DB_PORT, [portBind] |> ResizeArray<PortBinding> :> IList<PortBinding> ] |> toDict
+                    portBind.HostPort <- sprintf "%s/tcp" port
+                    hostConfig.PortBindings <- [port, [portBind] |> ResizeArray<PortBinding> :> IList<PortBinding> ] |> toDict
                     cp.HostConfig <- hostConfig
                     cp.Image <- imageMatchName
                     
@@ -90,60 +96,66 @@ module Tests =
                          return ipDb
                       }
                      
-                 return { Response = container; HostPort = DEFAULT_DOCKER_DB_PORT; Ip = dataBaseIp }
+                 return { Response = container; HostPort = port; Ip = dataBaseIp }
              }
          Async.RunSynchronously <| containerResponse()
          
     let private removeDockerContainer (docker : Docker) : Async<unit> =
             async {
-                let! stopContainerResult =
-                    docker.Client.Containers.StopContainerAsync(docker.ContainerResponse.ID,
-                                                               new ContainerStopParameters(),
-                                                               CancellationToken.None) |> Async.AwaitTask
-                if stopContainerResult then
-                     return! docker.Client.Containers.RemoveContainerAsync(docker.ContainerResponse.ID,
-                                                                       new ContainerRemoveParameters(),
-                                                                       CancellationToken.None) |> Async.AwaitTask
+                for container in docker.Containers do
+                    let! stopContainerResult =
+                        docker.Client.Containers.StopContainerAsync(container.ID,
+                                                                   new ContainerStopParameters(),
+                                                                   CancellationToken.None) |> Async.AwaitTask
+                    if stopContainerResult then
+                         return! docker.Client.Containers.RemoveContainerAsync(container.ID,
+                                                                           new ContainerRemoveParameters(),
+                                                                           CancellationToken.None) |> Async.AwaitTask
                 if docker.Client <> null then
                     docker.Client.Dispose()
             }
    
-    let private initDi (connString : string) : ServiceProvider =
+    let private initDi (connString : string) (domain : string) : ServiceProvider =
         let services = new ServiceCollection()
+        let config = (new ConfigurationBuilder())(*.AddJsonFile(SETTINGS_FILE_NAME, false, true)*).Build()
+        let _ = new FakeStartup(config)
+        config.GetSection("ActiveDirectory").GetSection("domain").Value <- domain
         services.AddIdoneIdentity()
             .AddIdoneDb(connString)
-            .AddSecurityDi() |> ignore
+            .AddSecurityDi(config) |> ignore
         let rootServiceProvider = services.BuildServiceProvider()
         use scope = rootServiceProvider.CreateScope()
         scope.ServiceProvider.GetRequiredService<AppContext>().InitTest()
         
         rootServiceProvider
      
-    let private initTestEnviroment() : TestEnviroment =
-        //TODO: создать контейнер для AD сервера
-        //TODO: зарегать тестового пользователя в AD
+    let private initTestEnviroment() : TestEnvironment =
         let dockerClient =
 //            let url = new Uri("npipe://./pipe/docker_engine") for windows
             let url = new Uri("unix:///var/run/docker.sock") //for unix
             let config = new DockerClientConfiguration(url, credentials = null, defaultTimeout = TimeSpan.FromSeconds 10000.)
             config.CreateClient()
-        let (containerResponse, hostPort, dbIp) =
-            let containerInfo = getContainer dockerClient "mcr.microsoft.com/mssql/server" "2019-CU3-ubuntu-18.04"
+        let (dbContainer, hostPort, dbIp) =
+            let containerInfo = getContainer <| makeDbContainerSettings dockerClient
             (containerInfo.Response, containerInfo.HostPort, containerInfo.Ip)
-        
+        let (adContainer, adIp) =
+            let containerInfo = getContainer <| makeAdContainerSettings dockerClient
+            (containerInfo.Response, containerInfo.Ip)
+        let containers = [dbContainer; adContainer]
         let connString = makeDatabaseSettings { IpAddress = dbIp; Port = hostPort }
         
         let di = 
             try
-               initDi connString 
+               initDi connString adIp
             with
                 | :? Exception as ex ->
-                    let docker = { ContainerResponse = containerResponse; Client = dockerClient }
+                    let docker = { Containers = containers; Client = dockerClient }
                     eprintf "connstring = %s" connString
+                    eprintf "ad domain = %s" adIp
                     removeDockerContainer docker |> Async.RunSynchronously
                     raise ex
         
-        let dbEnv = TestEnviroment.create di dockerClient containerResponse
+        let dbEnv = TestEnvironment.create di dockerClient containers
         
         dbEnv
         
