@@ -34,15 +34,17 @@ module Tests =
     let private pullImage (client : DockerClient) (image : string) (tag : string) : Async<unit> =
         async {
             let createParams = new ImagesCreateParameters()
-            createParams.FromImage <- image
+            createParams.FromImage <- sprintf "%s:%s" image tag
+            let cancelDownload = new CancellationTokenSource()
             let report = new Progress<JSONMessage>(fun msg ->
                 printfn "%s|%s|%s" msg.Status msg.ProgressMessage msg.ErrorMessage)
             let! _ =
-                client.Images.CreateImageAsync(createParams, new AuthConfig(), report)
-                |> Async.AwaitTask
-                
+                client.Images.CreateImageAsync(createParams, new AuthConfig(), report, cancelDownload.Token)
+                |> Async.AwaitTask    
             printfn "Ok pulled image %s to %s" image
             <| client.Configuration.EndpointBaseUri.ToString()
+            
+            ()
         }
         
     let private getImage (client : DockerClient)
@@ -70,6 +72,7 @@ module Tests =
                  let! foundImage = getImage client imagesList
                  if foundImage.IsNone then
                     printf "Docker image for %s:%s not found, try to pull" image tag
+                    //TODO: проблема с тем, что скачивает образ несколько раз разных версий =)
                     let! _ = pullImage client image tag
                     ()
                     
@@ -141,12 +144,9 @@ module Tests =
    
     let private initDi (connString : string) (domain : string) : ServiceProvider =
         let services = new ServiceCollection()
-        let config = (new ConfigurationBuilder())(*.AddJsonFile(SETTINGS_FILE_NAME, false, true)*).Build()
-        let _ = new FakeStartup(config)
-        config.GetSection("ActiveDirectory").GetSection("domain").Value <- domain
         services.AddIdoneIdentity()
             .AddIdoneDb(connString)
-            .AddSecurityDi(config) |> ignore
+            .AddSecurityDi(domain) |> ignore
         let rootServiceProvider = services.BuildServiceProvider()
         use scope = rootServiceProvider.CreateScope()
         scope.ServiceProvider.GetRequiredService<AppContext>().InitTest()

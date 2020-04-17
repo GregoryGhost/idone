@@ -14,12 +14,10 @@
         /// Добавить зависимости модуля.
         /// </summary>
         /// <param name="services"> Сервисы. </param>
+        /// <param name="adDomain"> Домен Active Directory сервиса. </param>
         /// <returns> Возвращает сервисы. </returns>
-        public static IServiceCollection AddSecurityDi(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddSecurityDi(this IServiceCollection services, string adDomain)
         {
-            //TODO: при разрастании параметров выделить в отдельный класс десериализации настроек
-            var adDomain = config.GetSection("ActiveDirectory").GetSection("domain").Value;
-
             services.AddScoped<UserService>();
             services.AddScoped(s => new AdService(adDomain));
 
