@@ -218,44 +218,44 @@ module Tests =
       tearDownAfterAllTest _docker <<
       testSequencedGroup "Последовательное выполнение тестов по работе с БД" 
         <| testList "Модуль админки" [       
-//        test "Регистрация нового пользователя" {
-//            //1.Найти пользователя в домене (берем хардкод данные)
-//            //2.Получить данные требуемого пользователя у AD сервера
-//            //3.Передать данные пользователя на регистрацию в системе
-//            //4.Найти зареганного пользователя в системе (в гриде всех пользователей)
-//
-//          //use cases
-//          let registratedUser = either {
-//            let! registratedUser =
-//                _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
-//            return! SEARCH_NAME_USER |> _security.FindRegistratedUser
-//          }
-//
-//          Expect.isRight registratedUser "Пользователь не зарегистрирован"
-//          clearUsers() |> ignore
-//        }
-//
-//        test "Назначение ролей пользователю" {
-//            //1. Зарегистрировать пользователя
-//            //2. Создать роли
-//            //3. Назначить роли пользователю
-//            //4. Получить роли пользователя
-//            //5. Получить пользователя из всех назначенных ролей
-//                
-//            let userRoles : Either<Error, DtoGridRole> = either {
-//                let! registratedUser = 
-//                    _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
-//                let roles =
-//                    ADMIN_AND_USER_ROLES |> _security.CreateRoles
-//                let! resultSettedRoles = 
-//                    _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)
-//
-//                return! registratedUser |> fillGridQueryUserRole |> _security.GetGridUserRoles
-//            }
-//
-//            Expect.isRight userRoles "Не найдены пользовательские роли"
-//            clearUserRoles() |> ignore
-//        }
+        test "Регистрация нового пользователя" {
+            //1.Найти пользователя в домене (берем хардкод данные)
+            //2.Получить данные требуемого пользователя у AD сервера
+            //3.Передать данные пользователя на регистрацию в системе
+            //4.Найти зареганного пользователя в системе (в гриде всех пользователей)
+
+          //use cases
+          let registratedUser = either {
+            let! registratedUser =
+                _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
+            return! SEARCH_NAME_USER |> _security.FindRegistratedUser
+          }
+
+          Expect.isRight registratedUser "Пользователь не зарегистрирован"
+          clearUsers() |> ignore
+        }
+
+        test "Назначение ролей пользователю" {
+            //1. Зарегистрировать пользователя
+            //2. Создать роли
+            //3. Назначить роли пользователю
+            //4. Получить роли пользователя
+            //5. Получить пользователя из всех назначенных ролей
+                
+            let userRoles : Either<Error, DtoGridRole> = either {
+                let! registratedUser = 
+                    _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
+                let roles =
+                    ADMIN_AND_USER_ROLES |> _security.CreateRoles
+                let! resultSettedRoles = 
+                    _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)
+
+                return! registratedUser |> fillGridQueryUserRole |> _security.GetGridUserRoles
+            }
+
+            Expect.isRight userRoles "Не найдены пользовательские роли"
+            clearUserRoles() |> ignore
+        }
         
         test "Назначение прав для роли" {
             //1. Создать роли
@@ -301,50 +301,50 @@ module Tests =
             clearRolesPerms() |> ignore
         }
 
-//        test "Назначены права для пользователя(через роли)" {
-//            //Создать роли
-//            //Создать права
-//            //Назначить права для роли
-//            //Зарегистрировать пользователя
-//            //Назначить роли пользователю
-//            //Получить права пользователя
-//            //Сравнить назначенныые права и полученные права
-//            let startRoles = PERMS_ROLES_LINKS |> getRoles
-//            let startPerms = PERMS_ROLES_LINKS |> getPerms
-//            let linksLength = List.length PERMS_ROLES_LINKS
-//
-//            let createdRoles = 
-//                    startRoles |> _security.CreateRoles
-//            Expect.hasLength <||| (createdRoles,
-//                                    linksLength,
-//                                    "Не удалось создать роли")
-//
-//            let createdPerms =
-//                startPerms |> _security.CreatePermissions
-//            Expect.hasLength <||| (createdPerms,
-//                                    linksLength, 
-//                                    "Не удалось создать права")
-//            let rolePermLinks =
-//                bindData createdRoles createdPerms
-//            let result = 
-//                _security.SetPermissionsForRole(rolePermLinks)
-//            Expect.hasLength <||| (result,
-//                            linksLength,
-//                            "Не удалось назначить права для ролей")
-//            
-//            let userPerms = either {
-//                let! registratedUser =
-//                    _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
-//                let! resultSettedUserRoles=
-//                    _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)
-//                return! registratedUser |> fillGridQueryUserPerms |> _security.GetUserPermissions
-//            }
-//            
-//            Expect.isRight userPerms "Не найдены пользовательские права"
-//            
-//            let actualUserPerms = userPerms.ValueUnsafe().Rows
-//            Expect.hasLength actualUserPerms linksLength "Не найдены пользовательские права"
-//            
-//            clearRolesPerms() |> ignore
-//        }
+        test "Назначены права для пользователя(через роли)" {
+            //Создать роли
+            //Создать права
+            //Назначить права для роли
+            //Зарегистрировать пользователя
+            //Назначить роли пользователю
+            //Получить права пользователя
+            //Сравнить назначенныые права и полученные права
+            let startRoles = PERMS_ROLES_LINKS |> getRoles
+            let startPerms = PERMS_ROLES_LINKS |> getPerms
+            let linksLength = List.length PERMS_ROLES_LINKS
+
+            let createdRoles = 
+                    startRoles |> _security.CreateRoles
+            Expect.hasLength <||| (createdRoles,
+                                    linksLength,
+                                    "Не удалось создать роли")
+
+            let createdPerms =
+                startPerms |> _security.CreatePermissions
+            Expect.hasLength <||| (createdPerms,
+                                    linksLength, 
+                                    "Не удалось создать права")
+            let rolePermLinks =
+                bindData createdRoles createdPerms
+            let result = 
+                _security.SetPermissionsForRole(rolePermLinks)
+            Expect.hasLength <||| (result,
+                            linksLength,
+                            "Не удалось назначить права для ролей")
+            
+            let userPerms = either {
+                let! registratedUser =
+                    _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
+                let! resultSettedUserRoles =
+                    _security.SetRolesForUser(ADMIN_AND_USER_ROLES, registratedUser)
+                return! registratedUser |> fillGridQueryUserPerms |> _security.GetUserPermissions
+            }
+            
+            Expect.isRight userPerms "Не найдены пользовательские права"
+            
+            let actualUserPerms = userPerms.ValueUnsafe().Rows
+            Expect.hasLength actualUserPerms linksLength "Не найдены пользовательские права"
+            
+            clearRolesPerms() |> ignore
+        }
       ]
