@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Idone.Back", "Idone.Back\Idone.Back.csproj", "{C7EE7DFC-8368-4475-97E8-814D376F2E31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Idone.Back", "Idone.Back\Idone.Back.csproj", "{C7EE7DFC-8368-4475-97E8-814D376F2E31}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Idone.Tests", "Idone.Tests\Idone.Tests.fsproj", "{D40D00BB-0F6F-4F91-B627-AF7438E19E93}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Idone.Security", "Idone.Security\Idone.Security.csproj", "{2EDCF030-3340-4296-B366-DFF2B1238BF1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Idone.Core", "Idone.Core\Idone.Core.csproj", "{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Idone.DAL", "Idone.DAL\Idone.DAL.csproj", "{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +27,18 @@ Global
 		{D40D00BB-0F6F-4F91-B627-AF7438E19E93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D40D00BB-0F6F-4F91-B627-AF7438E19E93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D40D00BB-0F6F-4F91-B627-AF7438E19E93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EDCF030-3340-4296-B366-DFF2B1238BF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EDCF030-3340-4296-B366-DFF2B1238BF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EDCF030-3340-4296-B366-DFF2B1238BF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EDCF030-3340-4296-B366-DFF2B1238BF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78E2ED50-9DB0-475C-BCD1-8C5A77ED9439}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEB428FC-AD59-4CF5-9AAD-A2DF9EE68D28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

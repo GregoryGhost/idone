@@ -1,6 +1,8 @@
-﻿module Idone.Tests
-open Expecto
+﻿namespace Idone.Tests
 
-[<EntryPoint>]
-let main argv =
-    Tests.runTestsInAssembly defaultConfig argv
+module EntryPoint = 
+    open Expecto
+
+    [<EntryPoint>]
+    let main argv =
+        Tests.runTestsInAssembly defaultConfig argv

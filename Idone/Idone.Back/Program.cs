@@ -1,24 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-
-namespace Idone.Back
+﻿namespace Idone.Back
 {
+    using Idone.DAL.Base;
+
+    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
+
     public class Program
     {
-        public static void Main(string[] args)
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            return WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        public static void Main(string[] args)
+        {
+            //TODO: нужна единая точка входа по инициализации настроек модулей.
+            var host = CreateWebHostBuilder(args).Build();
+            using (var scope = host.Services.CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<AppContext>().InitTest();
+            }
+
+            host.Run();
+        }
     }
 }
