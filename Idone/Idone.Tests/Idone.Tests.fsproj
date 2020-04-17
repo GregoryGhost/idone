@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <GenerateProgramFile>false</GenerateProgramFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="Constants.fs" />
+    <Compile Include="Extensions\LanguageExtExtension.fs" />
+    <Compile Include="Extensions\ExpectoExtension.fs" />
+    <Compile Include="Helpers\IdoneApiHelper.fs" />
+    <Compile Include="Helpers\TypeWorkers\BaseTypeWorker.fs" />
+    <Compile Include="Helpers\TypeWorkers\RoleWorker.fs" />
+    <Compile Include="Helpers\TypeWorkers\PermissionWorker.fs" />
+    <Compile Include="Helpers\IdoneApiWrapper.fs" />
+    <Compile Include="Helpers\FakeStartup.fs" />
+    <Compile Include="Startup.fs" />
+    <Content Include="appsettings.Development.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Compile Include="Sample.fs" />
+    <Compile Include="Main.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Docker.DotNet" Version="3.125.2" />
+    <PackageReference Include="Docker.DotNet.BasicAuth" Version="3.125.3" />
+    <PackageReference Include="Docker.DotNet.X509" Version="3.125.2" />
+    <PackageReference Include="Expecto" Version="8.10.1" />
+    <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="10.0.2" />
+    <PackageReference Include="FSharp.Core" Version="4.6.2" />
+    <PackageReference Include="LanguageExt.FSharp" Version="3.1.21" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Idone.Back\Idone.Back.csproj" />
+    <ProjectReference Include="..\Idone.Core\Idone.Core.csproj" />
+    <ProjectReference Include="..\Idone.Security\Idone.Security.csproj" />
+  </ItemGroup>
+</Project>
