@@ -146,7 +146,7 @@ module Tests =
         let services = new ServiceCollection()
         services.AddIdoneIdentity()
             .AddIdoneDb(connString)
-            .AddSecurityDi(domain) |> ignore
+            .AddSecurityDi(domain, AD_LOGIN, AD_PASSWORD) |> ignore
         let rootServiceProvider = services.BuildServiceProvider()
         use scope = rootServiceProvider.CreateScope()
         scope.ServiceProvider.GetRequiredService<AppContext>().InitTest()

@@ -36,7 +36,7 @@
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).Services
                     .AddIdoneIdentity()
                     .AddIdoneDb(connString)
-                    .AddSecurityDi("TODO:none");
+                    .AddSecurityDi("TODO:none", "cn=admin,dc=example,dc=org", "admin");
         }
     }
 }

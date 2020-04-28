@@ -13,7 +13,7 @@ module IdoneApiHelper =
 
     let fillUserCredentials (userData : DtoAdUser) : DtoRegistrateUser =
         new DtoRegistrateUser(
-            userData.Sid,
+            userData.Uid,
             userData.Surname,
             userData.Name,
             userData.Patronomic,

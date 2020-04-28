@@ -81,3 +81,6 @@ module Constants =
             Env = DOCKER_AD_ENV
         }
         
+    let AD_LOGIN = "cn=admin,dc=example,dc=org"
+    let AD_PASSWORD = "admin"
+        
