@@ -273,7 +273,7 @@
         public Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions link)
         {
             var dbQuery = _appContext.RolePermissions.AsQueryable();
-            var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.RoleId) ?? Left<Error, RolePermission>(Error.NotFoundRecord);
+            var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.RoleId.Id) ?? Left<Error, RolePermission>(Error.NotFoundRecord);
 
             var result = foundUser.Bind(rolePermission =>
             {

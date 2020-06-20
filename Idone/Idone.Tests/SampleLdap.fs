@@ -28,7 +28,7 @@ module AdTests =
         
         { Docker = docker; AdContainerInfo = info }
     
-    [<Tests>]
+//    [<Tests>]
     let tests =
         let _deps = initDeps()
         

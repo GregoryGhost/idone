@@ -20,7 +20,7 @@ namespace Idone.Security.Services
     /// <summary>
     /// Сервис по работе с AD-пользователями.
     /// </summary>
-    public partial class AdService
+    public class AdService
     {
         /// <summary>
         /// Домен сервиса Active Directory. 

@@ -72,8 +72,8 @@ module IdoneApiHelper =
                  (entity2 : #IIdentity list)
                  : DtoLinkRolePermissions list =
          (entity1, entity2) 
-         ||> List.map2 (fun e1 e2 ->
-             new DtoLinkRolePermissions(e1.Id, [e2.Id] |> List.toSeq))
+         ||> List.map2 (fun e1 e2  ->
+             new DtoLinkRolePermissions(e1, Seq.ofList [e2 :> IIdentity]))
 
     let toRoleDtos (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
@@ -81,7 +81,9 @@ module IdoneApiHelper =
     let toEitherDefault x = toEither x Error.Exception
 
     let takeFirst (rows : 'a seq) : Either<Error, 'a> = 
-        rows |> Seq.cast<'a> |> Seq.head |> LanguageExt.Prelude.Right<Error, 'a>
-
+        let mbFirst = rows |> Seq.cast<'a> |> Seq.tryHead
+        
+        toEither mbFirst Error.NotFoundRecord
+        
     let takeFirstRow (row : DtoGrid<'b>) : Either<Error, 'b> =
         row.Rows |> takeFirst
