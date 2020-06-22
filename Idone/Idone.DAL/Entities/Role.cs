@@ -28,7 +28,6 @@
         /// </summary>
         public IEnumerable<UserRole> UserRoles { get; private set; }
 
-
         /// <summary>
         /// Создать роль.
         /// </summary>

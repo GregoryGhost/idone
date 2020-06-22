@@ -12,6 +12,7 @@
     using LanguageExt;
     using LanguageExt.UnsafeValueAccess;
 
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
 
     using static LanguageExt.Prelude;
@@ -125,7 +126,7 @@
             var result = _appContext.Users.FindEither(linkUserRoles.UserId).Bind(
                 user =>
                 {
-                    linkUserRoles.RoleIds.Select(role => _appContext.Roles.Find<Role>(role)).Select(
+                    linkUserRoles.RoleIds.Select(_appContext.Roles.Find).Select(
                         role => 
                         {
                             UserRole.Create(user, role).Bind<EntityEntry<UserRole>>(link =>
@@ -146,8 +147,7 @@
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.User.Id == filter.Id));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole =>
-                _appContext.Roles.Find(userRole.Role.Id)).Where(role => role != null).Select(role => new DtoRowRole(role.Name, role.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole => new DtoRowRole(userRole.Role.Name, userRole.Role.Id));
             var result = new DtoGridRole(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridRole>(result);
@@ -160,8 +160,7 @@
             
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.Role.Id == filter.Id));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole =>
-                _appContext.Users.Find(userRole.User.Id)).Where(user => user != null).Select(user => new DtoRowUser(user.Email, user.DisplayName, user.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole => new DtoRowUser(userRole.User.Email, userRole.User.DisplayName, userRole.User.Id));
             var result = new DtoGridUser(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridUser>(result);
@@ -174,8 +173,7 @@
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(rolePermission => rolePermission.Role.Id == filter.Id));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(rolePermission =>
-                _appContext.Permissions.Find(rolePermission.Permission.Id)).Where(permission => permission != null).Select(permission => new DtoRowPermission(permission.Name, permission.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(rolePermission => new DtoRowPermission(rolePermission.Permission.Name, rolePermission.Permission.Id));
             var result = new DtoGridPermission(rows, _appContext.Permissions.Count());
 
             return Right<Error, DtoGridPermission>(result);
@@ -183,7 +181,7 @@
 
         public Either<Error, DtoGridPermission> GetGridUserPermissions(DtoGridQueryUserPermission gridQuery)
         {
-            var result = gridQuery.Filter.ToEither(() => Error.Exception).Bind(filter => GetGridUserRoles(new DtoGridQueryUserRole(filter, gridQuery.Pagination))).Bind(
+            var result = gridQuery.Filter.ToEither(Error.Exception).Bind(filter => GetGridUserRoles(new DtoGridQueryUserRole(filter, gridQuery.Pagination))).Bind(
                     gridRoles =>
                     {
                         var (errors, permissions) = gridRoles.Rows.Select(
@@ -217,8 +215,7 @@
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(permissionRole => permissionRole.Permission.Id == filter.Id));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(permissionRole =>
-                _appContext.Roles.Find(permissionRole.Role.Id)).Where(role => role != null).Select(role => new DtoRowRole(role.Name, role.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(permissionRole => new DtoRowRole(permissionRole.Role.Name, permissionRole.Role.Id));
             var result = new DtoGridRole(rows, _appContext.Roles.Count());
 
             return Right<Error, DtoGridRole>(result);
@@ -231,12 +228,13 @@
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(permission => permission.Name.Contains(filter.Name)));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(role => new DtoRowPermission(role.Name, role.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(permission => new DtoRowPermission(permission.Name, permission.Id));
             var result = new DtoGridPermission(rows, _appContext.Roles.Count());
 
             return Right<Error, DtoGridPermission>(result);
         }
         
+        //TODO: заменить на findEither
         public Either<Error, DtoRole> GetRoleById(int roleId)
         {
             var dbQuery = _appContext.Roles.AsQueryable().FirstOrDefault(role => role.Id == roleId) ?? Left<Error, Role>(Error.NotFoundRecord);
@@ -249,6 +247,7 @@
         public Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles link)
         {
             var dbQuery = _appContext.UserRoles.AsQueryable();
+            //TODO: заменить на findEither
             var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.UserId.Id) ?? Left<Error, UserRole>(Error.NotFoundRecord);
 
             var result = foundUser.Bind(userRole =>
@@ -261,6 +260,7 @@
             return result;
         }
 
+        //TODO: заменить на findEither
         public Either<Error, DtoPermission> GetPermissionById(int permId)
         {
             var dbQuery = _appContext.Permissions.AsQueryable().FirstOrDefault(permission => permission.Id == permId) ?? Left<Error, Permission>(Error.NotFoundRecord);
@@ -273,6 +273,7 @@
         public Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions link)
         {
             var dbQuery = _appContext.RolePermissions.AsQueryable();
+            //TODO: заменить на findEither
             var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.RoleId.Id) ?? Left<Error, RolePermission>(Error.NotFoundRecord);
 
             var result = foundUser.Bind(rolePermission =>
@@ -308,13 +309,15 @@
             var result = _appContext.Roles.FindEither(link.RoleId).Bind(
                 role =>
                 {
-                    link.PermissionIds.Select(permission => _appContext.Permissions.Find<Permission>(permission)).Select(
-                        permission => 
+                    link.PermissionIds.Select(_appContext.Permissions.Find).Select(
+                        permission =>
                         {
-                            RolePermission.Create(permission, role).Bind<EntityEntry<RolePermission>>(x => _appContext.RolePermissions.Add(x));
+                            RolePermission.Create(permission, role).
+                                           Bind<EntityEntry<RolePermission>>(x => _appContext.RolePermissions.Add(x));
                             return Right<Error, Permission>(permission);
                         });
                     var t = _appContext.TrySaveChanges().Bind<Success>(_ => Success.ItsSuccess);
+                    
                     return t;
                 });
 

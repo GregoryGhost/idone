@@ -19,6 +19,7 @@ module LanguageExtExtension =
     type EitherBuilder () =
         member __.Bind(x, f) = x >>= f
         member __.ReturnFrom x = x
+        member __.Return (x : 'r ) : Either<'l, 'r> = LanguageExt.Prelude.Right<'l, 'r>(x)
 
     /// Вычислительное выражение для монады Either из LanguageExt
     let either = new EitherBuilder()

@@ -81,7 +81,7 @@ module IdoneApiHelper =
     let toEitherDefault x = toEither x Error.Exception
 
     let takeFirst (rows : 'a seq) : Either<Error, 'a> = 
-        let mbFirst = rows |> Seq.cast<'a> |> Seq.tryHead
+        let mbFirst = rows |> Seq.tryHead
         
         toEither mbFirst Error.NotFoundRecord
         

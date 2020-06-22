@@ -40,14 +40,14 @@ module AdTests =
                 
                 let newUser = new DtoNewAdUser("Кулаков", "Григорий", "Викторович", "test@mail.ru", "gregory", "qweQWE1234")
                 let createdUser = ad.CreateUser newUser
-                Expect.isRight createdUser
+                Expect.isRight createdUser "Ожидалось создать AD пользователя"
                 
                 let filterDisplayName = "Кулаков*"
                 let foundUsers = ad.FindUsersByDisplayName filterDisplayName
                 
                 System.Console.WriteLine("found users " + JsonConvert.SerializeObject(foundUsers))
                 
-                Expect.isRight foundUsers
+                Expect.isRight foundUsers "Ожидалось найти зарегистрированного AD пользователя"
                 if foundUsers.ValueUnsafe() |> Seq.isEmpty then
                     let errorMsg = sprintf "Not found AD-user by filter %s" filterDisplayName
                     raise <| new System.Exception(errorMsg)

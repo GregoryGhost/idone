@@ -16,9 +16,9 @@ open Idone.Security
 
 
 type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
-    let _module = new EnterPoint(servicesProvider) :> ISecurityModule
-    let _roleWorker = new RoleWorker(_module)
-    let _permWorker = new PermissionWorker(_module)
+    let _module = EnterPoint(servicesProvider) :> ISecurityModule
+    let _roleWorker = RoleWorker(_module)
+    let _permWorker = PermissionWorker(_module)
     
     member __.RegistrateUser (registrateUser : DtoRegistrateUser) : Either<Error, DtoRegistratedUser> = 
         _module.RegistrateUser registrateUser
@@ -30,9 +30,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         _module.GetGridUser gridQueryUser
 
     member __.FindFirstDomainUser (searchExpression : string) : Either<Error, DtoAdUser> =
-        let takeFirstUser = takeFirst<DtoAdUser>
-        searchExpression |> __.FindUsersByDisplayName
-        >>= takeFirstUser
+        searchExpression |> __.FindUsersByDisplayName >>= takeFirst
 
     member __.FindRegistratedUser (searchName : string) : Either<Error, DtoRowUser> =
         let gridQueryUser = searchName |> fillGridQueryUser
@@ -47,8 +45,8 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.SetRolesForUser (roles : Role list, user : DtoRegistratedUser) : Either<Error, Success> =
         either {
             let roleIds = __.GetRoleIds roles
-            let userId = new DtoFilterById(user.Id)
-            let linkUserRoles = new DtoLinkUserRoles(userId, roleIds)
+            let userId = DtoFilterById(user.Id)
+            let linkUserRoles = DtoLinkUserRoles(userId, roleIds)
             
             return! _module.SetUserRoles linkUserRoles
         }     
@@ -98,10 +96,10 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> reduceAllRights
         |> Seq.toList
 
-    member __.GetRolesPermissions (roles: Role list) : DtoRowPermission list =
+    member __.GetRolesPermissions (roles: Role list) : DtoRowPermission seq =
         _roleWorker.GetDepTypes roles
 
-    member __.GetPermissionsRoles (perms: Perm list) : DtoRowRole list =
+    member __.GetPermissionsRoles (perms: Perm list) : DtoRowRole seq =
         _permWorker.GetDepTypes perms
         
     member __.GetUserPermissions (gridQueryUserPerm : DtoGridQueryUserPermission) : Either<Error, DtoGridPermission> =
