@@ -27,5 +27,10 @@ namespace Idone.DAL.DTO
         /// Название роли.
         /// </summary>
         public string Name { get; }
+
+        public static DtoRowRole CreateFromDb(string name, int id)
+        {
+            return new DtoRowRole(name, id);
+        }
     }
 }

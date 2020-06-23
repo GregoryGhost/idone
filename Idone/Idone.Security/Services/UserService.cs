@@ -28,7 +28,7 @@
         /// <summary>
         /// Контекст БД.
         /// </summary>
-        public readonly AppContext _appContext;
+        private readonly AppContext _appContext;
 
         /// <summary>
         /// Инициализировать зависимости.
@@ -51,7 +51,7 @@
             
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(user => user.DisplayName.Contains(filter.SearchName)));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(user => new DtoRowUser(user.Email, user.DisplayName, user.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(user => DtoRowUser.CreateFromDb(user.Email, user.DisplayName, user.Id));
             var result = new DtoGridUser(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridUser>(result);
@@ -115,7 +115,7 @@
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(role => role.Name.Contains(filter.Name)));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(role => new DtoRowRole(role.Name, role.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(role => DtoRowRole.CreateFromDb(role.Name, role.Id));
             var result = new DtoGridRole(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridRole>(result);
@@ -142,12 +142,12 @@
 
         public Either<Error, DtoGridRole> GetGridUserRoles(DtoGridQueryUserRole gridQuery)
         {
-            var dbQuery = _appContext.UserRoles.AsQueryable();
+            var dbQuery = _appContext.UserRoles.Include(x => x.Role).Include(x => x.User).AsQueryable();
             var optionFilter = gridQuery.Filter;
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.User.Id == filter.Id));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole => new DtoRowRole(userRole.Role.Name, userRole.Role.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole => DtoRowRole.CreateFromDb(userRole.Role.Name, userRole.Role.Id));
             var result = new DtoGridRole(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridRole>(result);
@@ -155,12 +155,13 @@
 
         public Either<Error, DtoGridUser> GetGridRoleUsers(DtoGridQueryRoleUser gridQuery)
         {
-            var dbQuery = _appContext.UserRoles.AsQueryable();
+            var dbQuery = _appContext.UserRoles.Include(x => x.User).Include(x => x.User).AsQueryable();
             var optionFilter = gridQuery.Filter;
-            
+
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(userRole => userRole.Role.Id == filter.Id));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(userRole => new DtoRowUser(userRole.User.Email, userRole.User.DisplayName, userRole.User.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(
+                userRole => DtoRowUser.CreateFromDb(userRole.User.Email, userRole.User.DisplayName, userRole.User.Id));
             var result = new DtoGridUser(rows, _appContext.Users.Count());
 
             return Right<Error, DtoGridUser>(result);
@@ -168,12 +169,15 @@
 
         public Either<Error, DtoGridPermission> GetGridRolePermissions(DtoGridQueryRolePermission gridQuery)
         {
-            var dbQuery = _appContext.RolePermissions.AsQueryable();
+            var dbQuery = _appContext.RolePermissions.Include(x => x.Permission).Include(x => x.Role).AsQueryable();
             var optionFilter = gridQuery.Filter;
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(rolePermission => rolePermission.Role.Id == filter.Id));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(rolePermission => new DtoRowPermission(rolePermission.Permission.Name, rolePermission.Permission.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(
+                rolePermission => DtoRowPermission.CreateFromDb(
+                    rolePermission.Permission.Name,
+                    rolePermission.Permission.Id));
             var result = new DtoGridPermission(rows, _appContext.Permissions.Count());
 
             return Right<Error, DtoGridPermission>(result);
@@ -187,7 +191,7 @@
                         var (errors, permissions) = gridRoles.Rows.Select(
                             role =>
                             {
-                                var filter = new DtoFilterById(role.Id);
+                                var filter = DtoFilterById.CreateFromDb(role.Id);
                                 var query = new DtoGridQueryRolePermission(
                                     filter,
                                     gridQuery.Pagination);
@@ -210,12 +214,12 @@
 
         public Either<Error, DtoGridRole> GetGridPermissionRoles(DtoGridQueryPermissionRoles gridQuery)
         {
-            var dbQuery = _appContext.RolePermissions.AsQueryable();
+            var dbQuery = _appContext.RolePermissions.Include(x => x.Permission).Include(x => x.Role).AsQueryable();
             var optionFilter = gridQuery.Filter;
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(permissionRole => permissionRole.Permission.Id == filter.Id));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(permissionRole => new DtoRowRole(permissionRole.Role.Name, permissionRole.Role.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(permissionRole => DtoRowRole.CreateFromDb(permissionRole.Role.Name, permissionRole.Role.Id));
             var result = new DtoGridRole(rows, _appContext.Roles.Count());
 
             return Right<Error, DtoGridRole>(result);
@@ -228,7 +232,7 @@
 
             optionFilter.Bind(filter => dbQuery = dbQuery.Where(permission => permission.Name.Contains(filter.Name)));
 
-            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(permission => new DtoRowPermission(permission.Name, permission.Id));
+            var rows = dbQuery.Paginate(gridQuery.Pagination).Select(permission => DtoRowPermission.CreateFromDb(permission.Name, permission.Id));
             var result = new DtoGridPermission(rows, _appContext.Roles.Count());
 
             return Right<Error, DtoGridPermission>(result);
@@ -246,7 +250,7 @@
 
         public Either<Error, Success> UnsetUserRoles(DtoLinkUserRoles link)
         {
-            var dbQuery = _appContext.UserRoles.AsQueryable();
+            var dbQuery = _appContext.UserRoles.Include(x => x.Role).Include(x => x.User).AsQueryable();
             //TODO: заменить на findEither
             var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.UserId.Id) ?? Left<Error, UserRole>(Error.NotFoundRecord);
 
@@ -272,7 +276,7 @@
 
         public Either<Error, Success> DenyRolePermissions(DtoLinkRolePermissions link)
         {
-            var dbQuery = _appContext.RolePermissions.AsQueryable();
+            var dbQuery = _appContext.RolePermissions.Include(x => x.Permission).Include(x => x.Role).AsQueryable();
             //TODO: заменить на findEither
             var foundUser = dbQuery.FirstOrDefault(x => x.Id == link.RoleId.Id) ?? Left<Error, RolePermission>(Error.NotFoundRecord);
 

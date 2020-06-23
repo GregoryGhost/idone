@@ -27,5 +27,10 @@ namespace Idone.DAL.DTO
         /// Наименование права.
         /// </summary>
         public string Name { get; }
+
+        public static DtoRowPermission CreateFromDb(string name, int id)
+        {
+            return new DtoRowPermission(name, id);
+        }
     }
 }
