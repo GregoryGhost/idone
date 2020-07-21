@@ -73,7 +73,7 @@ module IdoneApiHelper =
                  : DtoLinkRolePermissions list =
          (entity1, entity2) 
          ||> List.map2 (fun e1 e2  ->
-             new DtoLinkRolePermissions(e1, Seq.ofList [e2 :> IIdentity]))
+             new DtoLinkRolePermissions(e1, Seq.ofList [e2]))
 
     let toRoleDtos (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))

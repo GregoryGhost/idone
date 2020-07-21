@@ -90,9 +90,12 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> Seq.toList
 
     member __.SetPermissionsForRole (links: DtoLinkRolePermissions list) : Success list =
+        let printRoles x =
+            printfn "got roles: %A" x
+            x
         links
         |> List.map (fun link -> either {
-                return! (_module.AllowRolePermissions link) })
+                return! _module.AllowRolePermissions link |> printRoles })
         |> reduceAllRights
         |> Seq.toList
 

@@ -319,7 +319,7 @@
                             RolePermission.Create(permission, role).
                                            Bind<EntityEntry<RolePermission>>(x => _appContext.RolePermissions.Add(x));
                             return Right<Error, Permission>(permission);
-                        });
+                        }).ToList();
                     var t = _appContext.TrySaveChanges().Bind<Success>(_ => Success.ItsSuccess);
                     
                     return t;
