@@ -1,5 +1,4 @@
 ﻿namespace Idone.Tests.Helpers
-open Idone.DAL.Base
 
 module IdoneApiHelper =
     open Idone.DAL.DTO
@@ -46,6 +45,10 @@ module IdoneApiHelper =
     let fillGridQueryUserPerms (registratedUser : DtoRegistratedUser) : DtoGridQueryUserPermission =
         let filter = new DtoFilterById(registratedUser.Id)
         let query = new DtoGridQueryUserPermission(filter, FIRST_PAGE)
+        query
+        
+    let fillGridQueryRoleFirstPage : DtoGridQueryRole =
+        let query = new DtoGridQueryRole(FIRST_PAGE)
         query
         
     let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =

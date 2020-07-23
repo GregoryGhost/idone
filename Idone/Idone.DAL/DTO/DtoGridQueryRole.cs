@@ -7,13 +7,15 @@
     /// </summary>
     public class DtoGridQueryRole : AbstractGridQuery<DtoRoleFilter>
     {
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        /// <param name="filter"> Фильтр ролей. </param>
-        /// <param name="pagination"> Настройки постраничного вывода ролей. </param>
+        /// <inheritdoc />
         public DtoGridQueryRole(DtoRoleFilter filter, Pagination pagination)
             : base(filter, pagination)
+        {
+        }
+
+        /// <inheritdoc />
+        public DtoGridQueryRole(Pagination pagination)
+            : base(pagination)
         {
         }
     }
