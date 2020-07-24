@@ -34,5 +34,10 @@
         /// Идентификатор пользователя.
         /// </summary>
         public int Id { get; }
+
+        public static DtoRowUser CreateFromDb(string email, string displayName, int id)
+        {
+            return new DtoRowUser(email, displayName, id);
+        }
     }
 }

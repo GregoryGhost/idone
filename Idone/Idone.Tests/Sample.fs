@@ -7,6 +7,7 @@ module Tests =
     open LanguageExt.UnsafeValueAccess
 
     open Idone.Security
+    open Idone.Security.Services
     open Idone.DAL.DTO
     open Idone.DAL.Dictionaries
     open Idone.DAL.Base
@@ -17,7 +18,6 @@ module Tests =
     open Idone.Tests.Helpers.IdoneApiHelper
     open Idone.Tests.Types
 
-    open Microsoft.Extensions.Configuration
     open Microsoft.Extensions.DependencyInjection
     open Docker.DotNet
     open Docker.DotNet.Models
@@ -55,8 +55,15 @@ module Tests =
              
              return foundImage
          }
+     
+    let getDockerClient() : DockerClient =
+//          let url = new Uri("npipe://./pipe/docker_engine") for windows
+        let url = new Uri("unix:///var/run/docker.sock") //for unix
+        let config = new DockerClientConfiguration(url, credentials = null, defaultTimeout = TimeSpan.FromSeconds 10000.)
         
-    let private getContainer (containerSettings: ContainerSettings) : ContainerResponse =
+        config.CreateClient()
+        
+    let getContainer (containerSettings: ContainerSettings) : ContainerResponse =
          let imagesList = new ImagesListParameters()
          let (client, image, tag, env, port) =
              (containerSettings.Client,
@@ -127,7 +134,7 @@ module Tests =
              }
          Async.RunSynchronously <| containerResponse()
          
-    let private removeDockerContainer (docker : Docker) : Async<unit> =
+    let removeDockerContainer (docker : Docker) : Async<unit> =
             async {
                 for container in docker.Containers do
                     let! stopContainerResult =
@@ -146,7 +153,7 @@ module Tests =
         let services = new ServiceCollection()
         services.AddIdoneIdentity()
             .AddIdoneDb(connString)
-            .AddSecurityDi(domain) |> ignore
+            .AddSecurityDi(domain, AD_LOGIN, AD_PASSWORD) |> ignore
         let rootServiceProvider = services.BuildServiceProvider()
         use scope = rootServiceProvider.CreateScope()
         scope.ServiceProvider.GetRequiredService<AppContext>().InitTest()
@@ -154,11 +161,7 @@ module Tests =
         rootServiceProvider
      
     let private initTestEnviroment() : TestEnvironment =
-        let dockerClient =
-//            let url = new Uri("npipe://./pipe/docker_engine") for windows
-            let url = new Uri("unix:///var/run/docker.sock") //for unix
-            let config = new DockerClientConfiguration(url, credentials = null, defaultTimeout = TimeSpan.FromSeconds 10000.)
-            config.CreateClient()
+        let dockerClient = getDockerClient()
         let (dbContainer, hostPort, dbIp) =
             let containerInfo = getContainer <| makeDbContainerSettings dockerClient
             (containerInfo.Response, containerInfo.HostPort, containerInfo.Ip)
@@ -182,11 +185,6 @@ module Tests =
         let dbEnv = TestEnvironment.create di dockerClient containers
         
         dbEnv
-        
-    let private tearDownAfterAllTest (docker : Docker) (test : Test) : Test =
-        removeDockerContainer docker |> Async.RunSynchronously
-        test
-
 
     [<Tests>]
     let tests =
@@ -196,34 +194,30 @@ module Tests =
       
       let _security = new SecurityModuleWrapper(_servicesProvider)
 
-      let clearUsers() =
-        let dbContext = _servicesProvider.GetService<AppContext>()
-        dbContext.Users.Clear()
-        dbContext.SaveChanges()
-
-      let clearRolesPerms() =
+      let clearAll() =
         let dbContext = _servicesProvider.GetService<AppContext>()
         dbContext.RolePermissions.Clear()
-        dbContext.Roles.Clear()
-        dbContext.Permissions.Clear()
-        dbContext.SaveChanges()
-
-      let clearUserRoles() =
-        let dbContext = _servicesProvider.GetService<AppContext>()
         dbContext.UserRoles.Clear()
         dbContext.Users.Clear()
         dbContext.Roles.Clear()
         dbContext.SaveChanges()
       
-      tearDownAfterAllTest _docker <<
       testSequencedGroup "Последовательное выполнение тестов по работе с БД" 
-        <| testList "Модуль админки" [       
+        <| testList "Модуль админки" [
+        test "Подготовка пользователей OpenLDAP" {
+            let ad = _servicesProvider.GetService<AdService>()
+            let newUser = new DtoNewAdUser("Кулаков", "Григорий", "Викторович", "test@mail.ru", "gregory", "qweQWE1234")
+            let createdUser = ad.CreateUser newUser
+            
+            Expect.isRight createdUser "Не удалось создать Active Directory пользователя"
+        }
+        
         test "Регистрация нового пользователя" {
             //1.Найти пользователя в домене (берем хардкод данные)
             //2.Получить данные требуемого пользователя у AD сервера
             //3.Передать данные пользователя на регистрацию в системе
             //4.Найти зареганного пользователя в системе (в гриде всех пользователей)
-
+          clearAll() |> ignore
           //use cases
           let registratedUser = either {
             let! registratedUser =
@@ -232,7 +226,7 @@ module Tests =
           }
 
           Expect.isRight registratedUser "Пользователь не зарегистрирован"
-          clearUsers() |> ignore
+          clearAll() |> ignore
         }
 
         test "Назначение ролей пользователю" {
@@ -241,7 +235,8 @@ module Tests =
             //3. Назначить роли пользователю
             //4. Получить роли пользователя
             //5. Получить пользователя из всех назначенных ролей
-                
+            clearAll() |> ignore
+                          
             let userRoles : Either<Error, DtoGridRole> = either {
                 let! registratedUser = 
                     _security.RegistrateUserOnDomainUser SEARCH_DEFAULT_USER
@@ -254,7 +249,7 @@ module Tests =
             }
 
             Expect.isRight userRoles "Не найдены пользовательские роли"
-            clearUserRoles() |> ignore
+            clearAll() |> ignore
         }
         
         test "Назначение прав для роли" {
@@ -262,7 +257,8 @@ module Tests =
             //2. Назначить права для ролей
             //3. Получить права ролей
             //4. Получить роли из всех назначенных прав
-
+            clearAll() |> ignore
+          
             let startRoles = PERMS_ROLES_LINKS |> getRoles
             let startPerms = PERMS_ROLES_LINKS |> getPerms
             let linksLength = List.length PERMS_ROLES_LINKS
@@ -280,6 +276,9 @@ module Tests =
                                     "Не удалось создать права")
             let rolePermLinks =
                 bindData createdRoles createdPerms
+                
+            printfn "role perm links: %A" rolePermLinks
+            
             let result = 
                 _security.SetPermissionsForRole(rolePermLinks)
             Expect.hasLength <||| (result,
@@ -298,7 +297,47 @@ module Tests =
                 linksLength,
                 "Не найдены роли, назначенных прав")
             
-            clearRolesPerms() |> ignore
+            clearAll() |> ignore
+        }
+        
+        test "Создание ролей" {
+            clearAll() |> ignore
+            
+            let createdRoles =
+                ADMIN_AND_USER_ROLES |> _security.CreateRoles
+            let rolesLength = List.length ADMIN_AND_USER_ROLES
+            Expect.hasLength <||| (createdRoles,
+                                    rolesLength,
+                                    "Не удалось создать роли")
+            
+            let gotRoles =
+                fillGridQueryRoleFirstPage |> _security.GetGridRoles
+            Expect.isRight gotRoles "Не найдены созданные роли"
+            let unexpectedBehaviorMsg = sprintf "Не состыковочка с созданными ролями, gotRoles: %A" <| gotRoles.ValueUnsafe().Rows.ToList()
+            Expect.hasLength <||| (gotRoles.ValueUnsafe().Rows,
+                                  rolesLength,
+                                  unexpectedBehaviorMsg)
+            clearAll() |> ignore
+        }
+        
+        test "Поиск ролей по ид" {
+            clearAll() |> ignore
+            
+            let createdRoles =
+                ADMIN_AND_USER_ROLES |> _security.CreateRoles
+            let rolesLength = List.length ADMIN_AND_USER_ROLES
+            Expect.hasLength <||| (createdRoles,
+                                    rolesLength,
+                                    "Не удалось создать роли")
+
+            let gotRoles =
+                createdRoles |> _security.GetRolesByIds
+            Expect.isNonEmpty gotRoles "Не найдены созданные роли по идам"
+            let unexpectedBehaviorMsg = sprintf "Не состыковочка с созданными ролями, gotRoles: %A" <| gotRoles
+            Expect.hasLength <||| (gotRoles,
+                                  rolesLength,
+                                  unexpectedBehaviorMsg)
+            clearAll() |> ignore
         }
 
         test "Назначены права для пользователя(через роли)" {
@@ -309,6 +348,8 @@ module Tests =
             //Назначить роли пользователю
             //Получить права пользователя
             //Сравнить назначенныые права и полученные права
+            clearAll() |> ignore
+            
             let startRoles = PERMS_ROLES_LINKS |> getRoles
             let startPerms = PERMS_ROLES_LINKS |> getPerms
             let linksLength = List.length PERMS_ROLES_LINKS
@@ -326,6 +367,7 @@ module Tests =
                                     "Не удалось создать права")
             let rolePermLinks =
                 bindData createdRoles createdPerms
+            
             let result = 
                 _security.SetPermissionsForRole(rolePermLinks)
             Expect.hasLength <||| (result,
@@ -345,6 +387,10 @@ module Tests =
             let actualUserPerms = userPerms.ValueUnsafe().Rows
             Expect.hasLength actualUserPerms linksLength "Не найдены пользовательские права"
             
-            clearRolesPerms() |> ignore
+            clearAll() |> ignore
+        }
+        
+        testAsync "Удаление докер контейнеров" {
+            return! removeDockerContainer _docker
         }
       ]

@@ -10,19 +10,19 @@
         /// <summary>
         /// Контруктор по умолчанию.
         /// </summary>
-        /// <param name="sid"> SID пользователя. </param>
+        /// <param name="uid"> Составной идентификатор пользователя.. </param>
         /// <param name="surname"> Фамилия пользователя. </param>
         /// <param name="name"> Имя пользователя. </param>
         /// <param name="patronomic"> Отчество пользователя. </param>
         /// <param name="email"> Почта пользователя. </param>
         public DtoAdUser(
-            string sid,
+            string uid,
             string surname,
             string name,
             string patronomic,
             string email)
         {
-            Sid = sid;
+            Uid = uid;
             Surname = surname;
             Name = name;
             Patronomic = patronomic;
@@ -45,9 +45,9 @@
         public string Patronomic { get; }
 
         /// <summary>
-        /// Идентификатор безопасности пользователя.
+        /// Составной идентификатор пользователя.
         /// </summary>
-        public string Sid { get; }
+        public string Uid { get; }
 
         /// <summary>
         /// Фамилия.

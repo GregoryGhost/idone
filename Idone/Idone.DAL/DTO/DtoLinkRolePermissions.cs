@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="roleId"> Идентификатор роли. </param>
         /// <param name="permissionIds"> Идентификаторы прав.</param>
-        public DtoLinkRolePermissions(int roleId, IEnumerable<int> permissionIds)
+        public DtoLinkRolePermissions(IIdentity roleId, IEnumerable<IIdentity> permissionIds)
         {
             RoleId = roleId;
             PermissionIds = permissionIds;
@@ -23,11 +23,11 @@
         /// <summary>
         /// Идентификаторы прав.
         /// </summary>
-        public IEnumerable<int> PermissionIds { get; }
+        public IEnumerable<IIdentity> PermissionIds { get; }
 
         /// <summary>
         /// Идентификатор роли.
         /// </summary>
-        public int RoleId { get; }
+        public IIdentity RoleId { get; }
     }
 }

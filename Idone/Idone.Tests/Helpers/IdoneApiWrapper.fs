@@ -16,9 +16,9 @@ open Idone.Security
 
 
 type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
-    let _module = new EnterPoint(servicesProvider) :> ISecurityModule
-    let _roleWorker = new RoleWorker(_module)
-    let _permWorker = new PermissionWorker(_module)
+    let _module = EnterPoint(servicesProvider) :> ISecurityModule
+    let _roleWorker = RoleWorker(_module)
+    let _permWorker = PermissionWorker(_module)
     
     member __.RegistrateUser (registrateUser : DtoRegistrateUser) : Either<Error, DtoRegistratedUser> = 
         _module.RegistrateUser registrateUser
@@ -30,9 +30,7 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         _module.GetGridUser gridQueryUser
 
     member __.FindFirstDomainUser (searchExpression : string) : Either<Error, DtoAdUser> =
-        let takeFirstUser = takeFirst<DtoAdUser>
-        searchExpression |> __.FindUsersByDisplayName
-        >>= takeFirstUser
+        searchExpression |> __.FindUsersByDisplayName >>= takeFirst
 
     member __.FindRegistratedUser (searchName : string) : Either<Error, DtoRowUser> =
         let gridQueryUser = searchName |> fillGridQueryUser
@@ -47,8 +45,8 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
     member __.SetRolesForUser (roles : Role list, user : DtoRegistratedUser) : Either<Error, Success> =
         either {
             let roleIds = __.GetRoleIds roles
-            let userId = new DtoFilterById(user.Id)
-            let linkUserRoles = new DtoLinkUserRoles(userId, roleIds)
+            let userId = DtoFilterById(user.Id)
+            let linkUserRoles = DtoLinkUserRoles(userId, roleIds)
             
             return! _module.SetUserRoles linkUserRoles
         }     
@@ -83,6 +81,13 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
 
     member __.GetRoleIds (roles : Role list) : #IIdentity seq =
         _roleWorker.GetEntityIds roles
+        
+    member __.GetRolesByIds (roles : #IIdentity list) : DtoRole list =
+        roles
+        |> List.map (fun role -> either {
+            return! _module.GetRoleById role.Id })
+        |> reduceAllRights
+        |> Seq.toList
 
     member __.CreatePermissions (newPerms : Perm list) : DtoPermission list =
         newPerms |> preparePermData
@@ -92,16 +97,19 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
         |> Seq.toList
 
     member __.SetPermissionsForRole (links: DtoLinkRolePermissions list) : Success list =
+        let printRoles x =
+            printfn "got roles: %A" x
+            x
         links
         |> List.map (fun link -> either {
-                return! (_module.AllowRolePermissions link) })
+                return! _module.AllowRolePermissions link |> printRoles })
         |> reduceAllRights
         |> Seq.toList
 
-    member __.GetRolesPermissions (roles: Role list) : DtoRowPermission list =
+    member __.GetRolesPermissions (roles: Role list) : DtoRowPermission seq =
         _roleWorker.GetDepTypes roles
 
-    member __.GetPermissionsRoles (perms: Perm list) : DtoRowRole list =
+    member __.GetPermissionsRoles (perms: Perm list) : DtoRowRole seq =
         _permWorker.GetDepTypes perms
         
     member __.GetUserPermissions (gridQueryUserPerm : DtoGridQueryUserPermission) : Either<Error, DtoGridPermission> =

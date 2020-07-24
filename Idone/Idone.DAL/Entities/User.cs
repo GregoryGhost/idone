@@ -15,7 +15,7 @@
     /// <summary>
     /// Пользователь.
     /// </summary>
-    public class User : IdentityUser<int>
+    public class User : IdentityUser<int>, IIdentity
     {
         /// <summary>
         /// Конструктор для EF Core.

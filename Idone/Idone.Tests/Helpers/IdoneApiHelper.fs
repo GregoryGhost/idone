@@ -1,5 +1,4 @@
 ﻿namespace Idone.Tests.Helpers
-open Idone.DAL.Base
 
 module IdoneApiHelper =
     open Idone.DAL.DTO
@@ -13,7 +12,7 @@ module IdoneApiHelper =
 
     let fillUserCredentials (userData : DtoAdUser) : DtoRegistrateUser =
         new DtoRegistrateUser(
-            userData.Sid,
+            userData.Uid,
             userData.Surname,
             userData.Name,
             userData.Patronomic,
@@ -48,6 +47,10 @@ module IdoneApiHelper =
         let query = new DtoGridQueryUserPermission(filter, FIRST_PAGE)
         query
         
+    let fillGridQueryRoleFirstPage : DtoGridQueryRole =
+        let query = new DtoGridQueryRole(FIRST_PAGE)
+        query
+        
     let flattenDuplicates (records : Record<'a> seq) : Record<'a> option =
         records
         |> Seq.distinct
@@ -72,8 +75,8 @@ module IdoneApiHelper =
                  (entity2 : #IIdentity list)
                  : DtoLinkRolePermissions list =
          (entity1, entity2) 
-         ||> List.map2 (fun e1 e2 ->
-             new DtoLinkRolePermissions(e1.Id, [e2.Id] |> List.toSeq))
+         ||> List.map2 (fun e1 e2  ->
+             new DtoLinkRolePermissions(e1, Seq.ofList [e2]))
 
     let toRoleDtos (roles : Role list) : DtoNewRole list =
         roles |> List.map (fun role -> new DtoNewRole(role.Name))
@@ -81,7 +84,9 @@ module IdoneApiHelper =
     let toEitherDefault x = toEither x Error.Exception
 
     let takeFirst (rows : 'a seq) : Either<Error, 'a> = 
-        rows |> Seq.cast<'a> |> Seq.head |> LanguageExt.Prelude.Right<Error, 'a>
-
+        let mbFirst = rows |> Seq.tryHead
+        
+        toEither mbFirst Error.NotFoundRecord
+        
     let takeFirstRow (row : DtoGrid<'b>) : Either<Error, 'b> =
         row.Rows |> takeFirst

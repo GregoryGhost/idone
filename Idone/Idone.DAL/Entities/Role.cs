@@ -14,7 +14,7 @@
     /// <summary>
     /// Роль пользователя.
     /// </summary>
-    public class Role: IdentityRole<int>
+    public class Role: IdentityRole<int>, IIdentity
     {
         /// <summary>
         /// Конструктор для EF Core.
@@ -27,7 +27,6 @@
         /// Пользователи роли.
         /// </summary>
         public IEnumerable<UserRole> UserRoles { get; private set; }
-
 
         /// <summary>
         /// Создать роль.

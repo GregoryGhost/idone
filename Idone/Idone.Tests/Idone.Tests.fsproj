@@ -26,6 +26,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Compile Include="Sample.fs" />
+    <Compile Include="SampleLdap.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 

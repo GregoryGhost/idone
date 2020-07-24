@@ -22,13 +22,23 @@
         }
 
         /// <summary>
+        /// Инициализировать запрос только с постраничным выводом.
+        /// </summary>
+        /// <param name="pagination">Настройки постраничного вывода.</param>
+        protected AbstractGridQuery(Pagination pagination)
+        {
+            Filter = Option<TFilter>.None;
+            Pagination = pagination;
+        }
+
+        /// <summary>
         /// Фильтр.
         /// </summary>
-        public virtual Option<TFilter> Filter { get; private set; }
+        public virtual Option<TFilter> Filter { get; }
 
         /// <summary>
         /// Пагинация.
         /// </summary>
-        public virtual Pagination Pagination { get; private set; }
+        public virtual Pagination Pagination { get; }
     }
 }
