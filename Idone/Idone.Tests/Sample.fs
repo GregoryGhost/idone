@@ -319,6 +319,26 @@ module Tests =
                                   unexpectedBehaviorMsg)
             clearAll() |> ignore
         }
+        
+        test "Поиск ролей по ид" {
+            clearAll() |> ignore
+            
+            let createdRoles =
+                ADMIN_AND_USER_ROLES |> _security.CreateRoles
+            let rolesLength = List.length ADMIN_AND_USER_ROLES
+            Expect.hasLength <||| (createdRoles,
+                                    rolesLength,
+                                    "Не удалось создать роли")
+
+            let gotRoles =
+                createdRoles |> _security.GetRolesByIds
+            Expect.isNonEmpty gotRoles "Не найдены созданные роли по идам"
+            let unexpectedBehaviorMsg = sprintf "Не состыковочка с созданными ролями, gotRoles: %A" <| gotRoles
+            Expect.hasLength <||| (gotRoles,
+                                  rolesLength,
+                                  unexpectedBehaviorMsg)
+            clearAll() |> ignore
+        }
 
         test "Назначены права для пользователя(через роли)" {
             //Создать роли

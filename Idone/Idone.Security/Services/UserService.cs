@@ -121,6 +121,7 @@
             return Right<Error, DtoGridRole>(result);
         }
 
+
         public Either<Error, Success> SetUserRoles(DtoLinkUserRoles linkUserRoles)
         {
             var result = _appContext.Users.FindEither(linkUserRoles.UserId).Bind(

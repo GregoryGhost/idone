@@ -81,6 +81,13 @@ type SecurityModuleWrapper(servicesProvider : ServiceProvider) =
 
     member __.GetRoleIds (roles : Role list) : #IIdentity seq =
         _roleWorker.GetEntityIds roles
+        
+    member __.GetRolesByIds (roles : #IIdentity list) : DtoRole list =
+        roles
+        |> List.map (fun role -> either {
+            return! _module.GetRoleById role.Id })
+        |> reduceAllRights
+        |> Seq.toList
 
     member __.CreatePermissions (newPerms : Perm list) : DtoPermission list =
         newPerms |> preparePermData

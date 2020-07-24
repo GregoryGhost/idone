@@ -35,16 +35,16 @@
         /// <param name="keyValue"> Параметр поиска. </param>
         /// <returns> Возвращает монаду Maybe. </returns>
         public static Option<T> Find<T>(this DbSet<T> dbSet, IIdentity keyValue)
-            where T : class
+            where T : class, IIdentity
         {
-            var searchResult = dbSet.Find(keyValue.Id);
+            var searchResult = dbSet.FirstOrDefault(x => x.Id == keyValue.Id);
             return searchResult != null
                 ? Some(searchResult)
                 : None;
         }
 
         public static Either<Error, T> FindEither<T>(this DbSet<T> dbSet, IIdentity keyValue)
-            where T : class
+            where T : class, IIdentity
         {
             return dbSet.Find<T>(keyValue).ToEither(Error.NotFoundRecord);
         }

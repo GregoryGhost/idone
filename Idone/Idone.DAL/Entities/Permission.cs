@@ -8,7 +8,7 @@
     /// <summary>
     ///     Право на выполнение каких-то действий в системе.
     /// </summary>
-    public class Permission
+    public class Permission : IIdentity
     {
         /// <summary>
         ///     Конструктор для EF Core.
